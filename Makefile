@@ -1,26 +1,17 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -g -Iinclude
-LDFLAGS = -lncurses -Iinclude
+CFLAGS = -Wall -Wextra -Iinclude
 
-SRC = src/main.c src/chatbot.c src/files.c src/grammar.c src/stdphilia.c
-OBJ = $(SRC:.c=.o)
+SRC = $(wildcard src/*.c)
+OBJ = $(patsubst src/%.c,build/obj/%.o,$(SRC))
 
 TARGET = build/philia
 
-all: $(TARGET)
-
 $(TARGET): $(OBJ)
-	mkdir -p build
-	$(CC) $(OBJ) -o $(TARGET) $(LDFLAGS)
+	$(CC) $(OBJ) -o $@
 
-%.o: %.c
+build/obj/%.o: src/%.c
+	@mkdir -p build/obj
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ)
 	rm -rf build
-
-run: $(TARGET)
-	./$(TARGET)
-
-re: clean all
