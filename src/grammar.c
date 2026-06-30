@@ -190,17 +190,20 @@ char *extract_attribute(char **attributes, int count, char *prompt) {
   return attribute;
 }
 
-void store_context(Context *context, char *subject, char *attribute) {
+void store_context(Fact *context, char *subject, char *attribute, char *value) {
   free(context->subject);
   free(context->attribute);
+  free(context->value);
 
   context->subject = strdup(subject);
   context->attribute = strdup(attribute);
+  context->value = strdup(value);
 }
 
-void free_context(Context *context) {
+void free_context(Fact *context) {
   free(context->subject);
   free(context->attribute);
+  free(context->value);
 }
 
 int has_pronoun(char *prompt) {

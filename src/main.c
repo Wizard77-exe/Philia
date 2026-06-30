@@ -33,9 +33,10 @@ int main() {
     return 1;
   }
 
-  Context context = {
+  Fact context = {
     .subject = NULL,
-    .attribute = NULL
+    .attribute = NULL,
+    .value = NULL
   };
 
   while (1) {

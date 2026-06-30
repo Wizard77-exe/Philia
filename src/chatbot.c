@@ -5,20 +5,33 @@
 #include "grammar.h"
 #include "stdphilia.h"
 
-char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subjects_count, char **attributes, int attributes_count, char *prompt, Context *context) {
+char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subjects_count, char **attributes, int attributes_count, char *prompt, Fact *context) {
   char *subject = extract_subject(subjects, subjects_count, prompt);
+  char *attribute = extract_attribute(attributes, attributes_count, prompt);
+  char *value = NULL;
+
+  if (subject == NULL && attribute == NULL && strstr(prompt, "who")) {
+    for (int i = 0; i < knowledge_count; i++) {
+      if (strstr(prompt, knowledge[i].value)) {
+        value = strdup(knowledge[i].subject);
+        break;
+      }
+    }
+  }
+
+  if (value != NULL) {
+    free(subject);
+    free(attribute);
+    return value;
+  }
 
   if (subject == NULL && has_pronoun(prompt)) {
     subject = strdup(context->subject);
   }
 
-  char *attribute = extract_attribute(attributes, attributes_count, prompt);
-
   if (attribute == NULL) {
     attribute = strdup(context->attribute);
   }
-
-  char *value = NULL;
 
   // searching for value from the knowledge array.
   for (int i = 0; i < knowledge_count; i++) {
@@ -28,7 +41,7 @@ char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subje
     }
   }
 
-  store_context(context, subject, attribute);
+  store_context(context, subject, attribute, value);
 
   free(subject);
   free(attribute);
@@ -36,7 +49,7 @@ char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subje
   return value;
 }
 
-int learn(Fact **knowledges, int *knowledges_count, Context context) {
+int learn(Fact **knowledges, int *knowledges_count, Fact context) {
   printf("\n%sPHILIA:%s What should I answer?\n\n", BRIGHT_MAGENTA, RESET);
   printf("%sHAPPY:%s ", BRIGHT_CYAN, RESET);
 
