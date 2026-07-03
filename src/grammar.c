@@ -178,7 +178,6 @@ char *extract_subject(char **subjects, int count, char *prompt) {
 }
 
 char *extract_attribute(char **attributes, int count, char *prompt) {
-  lowercase_s(prompt);
   
   char *attribute = NULL;
 
@@ -320,9 +319,11 @@ void update(char *prompt, char **subjects, int subjects_count, char **attributes
   char *value = extract_value(prompt);
 
   if (subject == NULL && has_pronoun(prompt)) {
+    free(subject);
     subject = strdup(context.subject);
   }
   if (subject == NULL) {
+    free(subject);
     subject = resolve_name(*knowledges, knowledges_count, prompt);
   }
 
@@ -330,6 +331,7 @@ void update(char *prompt, char **subjects, int subjects_count, char **attributes
 
   for (int i = 0; i < knowledges_count; i++) {
     if (strcmp((*knowledges)[i].subject, subject) == 0 && strcmp((*knowledges)[i].attribute, attribute) == 0) {
+      free((*knowledges)[i].value);
       (*knowledges)[i].value = strdup(value);
       found = 1;
       break;

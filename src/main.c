@@ -6,6 +6,7 @@
 #include "grammar.h"
 #include "stdphilia.h"
 #include "chatbot.h"
+#include "templates.h"
 
 int main() {
   srand(time(NULL));            // seeding the random function.
@@ -34,6 +35,7 @@ int main() {
   if (knowledges == NULL) {
     free_string_array(subjects, subjects_count);
     free_string_array(attributes, attributes_count);
+    free_knowledge(knowledges, knowledges_count);
     return 1;
   }
 
@@ -78,8 +80,9 @@ int main() {
           }
           break;
         }
-
-        printf("\n%sPHILIA:%s %s\n\n", BRIGHT_GREEN, RESET, value);
+        
+        get_template(templates, templates_count, context.subject, context.attribute, value);
+        //printf("\n%sPHILIA:%s %s\n\n", BRIGHT_GREEN, RESET, value);
 
         free(value);
         break;

@@ -37,7 +37,7 @@ char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subje
 
   if (subject == NULL && attribute == NULL && strstr(prompt, "who")) {
     for (int i = 0; i < knowledge_count; i++) {
-      copy = NULL;
+      free(copy);
       copy = strdup(knowledge[i].value);    // making the copy of the current value;
       lowercase_s(copy);
       if (strstr(prompt, copy)) {
