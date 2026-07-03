@@ -37,15 +37,6 @@
 #define BG_CYAN    "\033[46m"
 #define BG_WHITE   "\033[47m"
 
-// intent enum 
-typedef enum {
-  QUESTION, 
-  COMMAND,
-  GREETINGS,
-  CASUAL,
-  UNKNOWN
-} Intent;
-
 void free_string_array(char **s, int count);
 
 void lowercase_s(char *string);

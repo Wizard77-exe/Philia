@@ -10,14 +10,14 @@ role
 height
 weight
 nationality
-favorite food
-favorite drink
-favorite color
-favorite song
-favorite movie
-favorite book
-favorite game
-favorite language
+favorite_food
+favorite_drink
+favorite_color
+favorite_song
+favorite_movie
+favorite_book
+favorite_game
+favorite_language
 personality
 hobby
 interest

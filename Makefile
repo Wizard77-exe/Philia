@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude
+CFLAGS = -g -Wall -Wextra -Iinclude
 
 SRC = $(wildcard src/*.c)
 OBJ = $(patsubst src/%.c,build/obj/%.o,$(SRC))

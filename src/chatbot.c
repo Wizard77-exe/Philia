@@ -1,18 +1,46 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "grammar.h"
 #include "stdphilia.h"
 
-char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subjects_count, char **attributes, int attributes_count, char *prompt, Fact *context) {
+char *resolve_name(Fact *knowledge, int knowledge_count, char *prompt) {
+  char *subject = NULL;
+
+  char *copy = NULL;
+
+  for (int i = 0; i < knowledge_count; i++) {
+    if (strcmp(knowledge[i].attribute, "name") == 0) {
+      copy = NULL;
+      copy = strdup(knowledge[i].value);
+      lowercase_s(copy);
+
+      if (strstr(prompt, copy)) {
+        subject = strdup(knowledge[i].subject);
+        break;
+      }
+    }
+  }
+  
+  free(copy);
+  return subject;
+}
+
+char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subjects_count, char **attributes, int attributes_count, char *prompt, Context *context) {
   char *subject = extract_subject(subjects, subjects_count, prompt);
   char *attribute = extract_attribute(attributes, attributes_count, prompt);
   char *value = NULL;
 
+  char *copy = NULL;
+
   if (subject == NULL && attribute == NULL && strstr(prompt, "who")) {
     for (int i = 0; i < knowledge_count; i++) {
-      if (strstr(prompt, knowledge[i].value)) {
+      copy = NULL;
+      copy = strdup(knowledge[i].value);    // making the copy of the current value;
+      lowercase_s(copy);
+      if (strstr(prompt, copy)) {
         value = strdup(knowledge[i].subject);
         break;
       }
@@ -20,13 +48,18 @@ char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subje
   }
 
   if (value != NULL) {
+    free(copy);
     free(subject);
     free(attribute);
     return value;
   }
 
-  if (subject == NULL && has_pronoun(prompt)) {
+  if (subject == NULL || has_pronoun(prompt)) {
     subject = strdup(context->subject);
+  }
+
+  if (subject == NULL) {
+    subject = resolve_name(knowledge, knowledge_count, prompt);
   }
 
   if (attribute == NULL) {
@@ -41,15 +74,16 @@ char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subje
     }
   }
 
-  store_context(context, subject, attribute, value);
+  store_context(context, subject, attribute);
 
+  free(copy);
   free(subject);
   free(attribute);
 
   return value;
 }
 
-int learn(Fact **knowledges, int *knowledges_count, Fact context) {
+int learn(Fact **knowledges, int *knowledges_count, Context context) {
   printf("\n%sPHILIA:%s What should I answer?\n\n", BRIGHT_MAGENTA, RESET);
   printf("%sHAPPY:%s ", BRIGHT_CYAN, RESET);
 
@@ -87,4 +121,54 @@ void save_new_knowledge(char *subject, char *attribute, char *value) {
   if (fclose(file) != 0) {
     printf("%sPHILIA:%s Ooops! There's some error closing the knowledges.null after saving new knowledge!\n\n", BRIGHT_MAGENTA, RESET);
   }
+}
+
+void greet_back(void) {
+  char *greetings[] = {
+    "Hellooooo! How are you Dad?\n",
+    "Hi there dad, still debugging a segfault?\n",
+    "Hello dad, wassup >.<\n",
+    "Hi dad, do you have a segfault?\n",
+    "Hello dad, can you give me a pat?\n"
+  };
+
+  printf("\n%sPHILIA:%s %s\n", BRIGHT_GREEN, RESET, greetings[rand() % 5]);
+}
+
+void save_knowledges(Fact *knowledges, int knowledges_count) {
+  FILE *file = fopen("data/knowledge.null", "w");
+
+  if (file == NULL) {
+    printf("\n%sPHILIA:%s There's an error opening the knowledge.null file Dad!!\n\n", BRIGHT_GREEN, RESET);
+    return;
+  }
+
+  for (int i = 0; i < knowledges_count; i++) {
+    fprintf(file, "%s.%s=%s\n", knowledges[i].subject, knowledges[i].attribute, knowledges[i].value);
+  }
+
+  if (fclose(file) != 0) {
+    printf("\n%sPHILIA:%s Dad! I can't close the file knowledge.null!\n\n", BRIGHT_GREEN, RESET);
+    return;
+  }
+}
+
+// helper function to randomly get a reply to a laugh.
+void laugh() {
+  char *laugh_replies[] = {
+    "My dad's laughing after a thousand segfault!",
+    "What's funny? Dad! Mom's furious because you forgot to kiss her this morning!",
+    "Hahaha, what's funny dad? Tell me tell me!"
+  };
+
+  printf("\n%sPHILIA:%s %s\n\n", BRIGHT_GREEN, RESET, laugh_replies[rand() % 3]);
+}
+
+void reply_to_unknown(char *prompt) {
+  if (strstr(prompt, "haha")) {
+    laugh();
+    return;
+  }
+
+  printf("\n%sPHILIA:%s Yeah? [>.<]\n\n", BRIGHT_GREEN, RESET);
 }

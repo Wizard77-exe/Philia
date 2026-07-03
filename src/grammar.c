@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "grammar.h"
+#include "chatbot.h"
 #include "files.h"
 #include "stdphilia.h"
 
@@ -190,20 +192,17 @@ char *extract_attribute(char **attributes, int count, char *prompt) {
   return attribute;
 }
 
-void store_context(Fact *context, char *subject, char *attribute, char *value) {
+void store_context(Context *context, char *subject, char *attribute) {
   free(context->subject);
   free(context->attribute);
-  free(context->value);
 
   context->subject = strdup(subject);
   context->attribute = strdup(attribute);
-  context->value = strdup(value);
 }
 
-void free_context(Fact *context) {
+void free_context(Context *context) {
   free(context->subject);
   free(context->attribute);
-  free(context->value);
 }
 
 int has_pronoun(char *prompt) {
@@ -229,4 +228,120 @@ int has_pronoun(char *prompt) {
 
     free(copy);
     return 0;
+}
+
+// helper functions to get intent
+bool is_greeting(char *prompt) {
+  char *greeting_keywords[] = {
+    "hello", "hi there", "good day"
+  };
+
+  for (int i = 0; i < 3; i++) {
+    if (strstr(prompt, greeting_keywords[i])) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool is_fact_query(char *prompt) {
+  bool is_fact_query = false;
+
+  char *starters[] = {
+    "who", "what", "when", "where", "how"
+  };
+
+  for (int i = 0; i < 5; i++) {
+    if (strstr(prompt, starters[i])) {
+      is_fact_query = true;
+      break;
+    }
+  }
+
+  return (is_fact_query || strstr(prompt, "?"));
+}
+
+bool is_update(char *prompt) {
+  char *copy = strdup(prompt);
+
+  char *token = strtok(copy, " .,!?");
+  lowercase_s(token);
+
+  if (strcmp(token, "update") == 0 || (strstr(prompt, "update") && strstr(prompt, "?"))) {
+    free(copy);
+    return true;
+  }
+
+  free(copy);
+  return false;
+}
+
+Intent get_intent(char *prompt) {
+  if (is_greeting(prompt)) {
+    return INTENT_GREETING;
+  }
+
+  if (is_update(prompt)) {
+    return INTENT_UPDATE;
+  }
+
+  if (is_fact_query(prompt)) {
+    return INTENT_FACT_QUERY;
+  }
+
+  return INTENT_UNKNOWN;
+}
+
+char *extract_value(char *prompt) {
+  char *copy = strdup(prompt);
+
+  char *token = strtok(copy, " .,!?");
+  
+  char *value = NULL;
+
+  while(token) {
+    if (strcmp(token, "to") == 0 || strcmp(token, "into") == 0) {
+      token = strtok(NULL, " .,?!");
+      value = strdup(token);
+      break;
+    }
+
+    token = strtok(NULL, " .,?!");
+  }
+
+  free(copy);
+  return value;
+}
+
+void update(char *prompt, char **subjects, int subjects_count, char **attributes, int attributes_count, Context context, Fact **knowledges, int knowledges_count) {
+  char *subject = extract_subject(subjects, subjects_count, prompt);
+  char *attribute = extract_attribute(attributes, attributes_count, prompt);
+  char *value = extract_value(prompt);
+
+  if (subject == NULL && has_pronoun(prompt)) {
+    subject = strdup(context.subject);
+  }
+  if (subject == NULL) {
+    subject = resolve_name(*knowledges, knowledges_count, prompt);
+  }
+
+  int found = 0;
+
+  for (int i = 0; i < knowledges_count; i++) {
+    if (strcmp((*knowledges)[i].subject, subject) == 0 && strcmp((*knowledges)[i].attribute, attribute) == 0) {
+      (*knowledges)[i].value = strdup(value);
+      found = 1;
+      break;
+    }
+  }
+  if (found) {
+    printf("\n%sPHILIA:%s DONE SIRRRR! >.<\n\n", BRIGHT_GREEN, RESET);
+  } else {
+    printf("\n%sPHILIA:%s Can't find the fact to update, dad!!\n\n", BRIGHT_GREEN, RESET);
+  }
+
+  free(subject);
+  free(attribute);
+  free(value);
 }

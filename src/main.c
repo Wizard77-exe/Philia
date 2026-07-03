@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
 #include "grammar.h"
 #include "stdphilia.h"
 #include "chatbot.h"
 
 int main() {
+  srand(time(NULL));            // seeding the random function.
+
   int subjects_count;
   int attributes_count;
   int knowledges_count;
@@ -33,10 +37,9 @@ int main() {
     return 1;
   }
 
-  Fact context = {
+  Context context = {
     .subject = NULL,
-    .attribute = NULL,
-    .value = NULL
+    .attribute = NULL
   };
 
   while (1) {
@@ -46,28 +49,48 @@ int main() {
 
     input[strcspn(input, "\n")] = '\0';
 
+    lowercase_s(input);
+
     if (strncmp(input, "exit", 4) == 0) {
       break;
     }
 
-    char *value = get_value(knowledges, knowledges_count, subjects, subjects_count, attributes, attributes_count, input, &context);
+    Intent intent = get_intent(input);
 
-    if (value == NULL) {
-      // learn() 
-      if (learn(&knowledges, &knowledges_count, context)) {
-        Fact new_fact = knowledges[knowledges_count - 1];
+    switch (intent) {
+      case INTENT_GREETING:
+        greet_back();
+        break;
+      case INTENT_UPDATE:
+        // update function;
+        update(input, subjects, subjects_count, attributes, attributes_count, context, &knowledges, knowledges_count);
+        break;
+      case INTENT_FACT_QUERY:
+        // getting value ... get_value() and learn();
+        char *value = get_value(knowledges, knowledges_count, subjects, subjects_count, attributes, attributes_count, input, &context);
 
-        save_new_knowledge(new_fact.subject, new_fact.attribute, new_fact.value);
-        continue;
-      }
-      // save_new_item()
-      break;
+        if (value == NULL) {
+          // learn
+          if (learn(&knowledges, &knowledges_count, context)) {
+            Fact new_fact = knowledges[knowledges_count - 1];
+
+            save_new_knowledge(new_fact.subject, new_fact.attribute, new_fact.value);
+          }
+          break;
+        }
+
+        printf("\n%sPHILIA:%s %s\n\n", BRIGHT_GREEN, RESET, value);
+
+        free(value);
+        break;
+      case INTENT_UNKNOWN:
+        // random reply to unknown.
+        reply_to_unknown(input);
+        break;
     }
 
-    printf("\n%sPHILIA:%s %s\n\n",BRIGHT_GREEN, RESET, value);
-
-    free(value);
   }
+  save_knowledges(knowledges, knowledges_count);
 
   free_string_array(subjects, subjects_count);
   free_string_array(attributes, attributes_count);
