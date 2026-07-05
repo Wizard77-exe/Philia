@@ -13,7 +13,6 @@ char *resolve_name(Fact *knowledge, int knowledge_count, char *prompt) {
 
   for (int i = 0; i < knowledge_count; i++) {
     if (strcmp(knowledge[i].attribute, "name") == 0) {
-      copy = NULL;
       copy = strdup(knowledge[i].value);
       lowercase_s(copy);
 
@@ -54,7 +53,7 @@ char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subje
     return value;
   }
 
-  if (subject == NULL || has_pronoun(prompt)) {
+  if (subject == NULL && has_pronoun(prompt)) {
     subject = strdup(context->subject);
   }
 
