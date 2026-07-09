@@ -27,7 +27,7 @@ char *mother_age_templates[] = {
 char *mother_gender_templates[] = {
   "Now that's another thing dad. You're losing it already. Of course mom's a %s\n\n",
   "What?!!! Dadddd! She's a %s! How can you impregnate her if she's a male?!\n\n",
-  "What do you mean what's her gender?! Dad!! I'm telling mom you're losing it! She's a %s of course\n\n"
+  "What do you mean what's her gender?! Dad!! I'm telling mom you're losing it! She's a %s\n\n",
   "She's a %s, dad. Did those segfaults making you go insane now?\n\n",
   "No way you're asking me that. Of course she's a %s\n\n"
 };

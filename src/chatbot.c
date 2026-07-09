@@ -13,10 +13,12 @@ char *resolve_name(Fact *knowledge, int knowledge_count, char *prompt) {
 
   for (int i = 0; i < knowledge_count; i++) {
     if (strcmp(knowledge[i].attribute, "name") == 0) {
+      free(copy);
       copy = strdup(knowledge[i].value);
       lowercase_s(copy);
 
       if (strstr(prompt, copy)) {
+        free(subject);
         subject = strdup(knowledge[i].subject);
         break;
       }
@@ -40,6 +42,7 @@ char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subje
       copy = strdup(knowledge[i].value);    // making the copy of the current value;
       lowercase_s(copy);
       if (strstr(prompt, copy)) {
+        free(value);
         value = strdup(knowledge[i].subject);
         break;
       }
@@ -54,20 +57,24 @@ char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subje
   }
 
   if (subject == NULL && has_pronoun(prompt)) {
+    free(subject);
     subject = strdup(context->subject);
   }
 
   if (subject == NULL) {
+    free(subject);
     subject = resolve_name(knowledge, knowledge_count, prompt);
   }
 
   if (attribute == NULL) {
+    free(attribute);
     attribute = strdup(context->attribute);
   }
 
   // searching for value from the knowledge array.
   for (int i = 0; i < knowledge_count; i++) {
     if ((strcmp(knowledge[i].subject, subject) == 0) && (strcmp(knowledge[i].attribute, attribute) == 0)) {
+      free(value);
       value = strdup(knowledge[i].value);
       break;
     }
@@ -83,7 +90,7 @@ char *get_value(Fact *knowledge, int knowledge_count, char **subjects, int subje
 }
 
 int learn(Fact **knowledges, int *knowledges_count, Context context) {
-  printf("\n%sPHILIA:%s What should I answer?\n\n", BRIGHT_MAGENTA, RESET);
+  printf("\n%sPHILIA:%s What should I answer?\n\n", BRIGHT_GREEN, RESET);
   printf("%sHAPPY:%s ", BRIGHT_CYAN, RESET);
 
   char input[256];
@@ -103,7 +110,7 @@ int learn(Fact **knowledges, int *knowledges_count, Context context) {
 
   (*knowledges_count)++;
 
-  printf("\n%sPHILIA:%s Got it!\n\n", BRIGHT_MAGENTA, RESET);
+  printf("\n%sPHILIA:%s Got it!\n\n", BRIGHT_GREEN, RESET);
 
   return 1;
 }
