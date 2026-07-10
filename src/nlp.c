@@ -479,7 +479,7 @@ void generate_response(Fact *fact) {
 /*============Learning and persistence of new facts===*/
 Fact learn_fact(Query q) {
   char answer[64];
-  Fact f;
+  Fact f = {0};
 
   printf("%sPHILIA:%s I don't know dad, what should I answer?\n\n", BRIGHT_GREEN, RESET);
   printf("%sHAPPY:%s ", BRIGHT_CYAN, RESET);
@@ -531,3 +531,94 @@ void save_knowledges(Fact *knowledges, int knowledges_count) {
   return;
 }
 /*====================================================*/
+
+//===============V2.1.0 START==========================
+//------------CANONICALIZATION-------------------------
+
+static void free_synonym(Synonym s) {
+  free(s.synonym);
+  free(s.canonical);
+}
+
+void free_synonyms(Synonym *s, int count) {
+  for (int i = 0; i < count; i++) {
+    free_synonym(s[i]);
+  }
+
+  free(s);
+}
+
+Synonym *load_synonyms(int *synonyms_count) {
+  FILE *file = fopen("data/synonyms.null", "r");
+
+  if (file == NULL) {
+    printf("%sPHILIA:%s DADDDDD!! I can't open the synonyms fileeeeee! (%s)\n\n", BRIGHT_GREEN, RESET, strerror(errno));
+    return NULL;
+  }
+
+  int n = count_lines(file);
+  int counter = 0;
+
+  Synonym *synonyms = malloc(sizeof(Synonym) * n);
+
+  if (synonyms == NULL) {
+    printf("%sPHILIA:%s Hehe, hey dad, looks like I wasn't able to allocate memory for the synonyms here, hehe.'.'\n\n", BRIGHT_GREEN, RESET);
+    fclose(file);
+    *synonyms_count = 0;
+    return NULL;
+  }
+
+  char line[128];
+  char *token;
+
+  while(fgets(line, sizeof(line), file)) {
+    line[strcspn(line, "\n")] = '\0';
+
+    synonyms[counter] = (Synonym){0};
+
+    token = strtok(line, "=");
+    synonyms[counter].synonym = strdup(token);
+
+    if (synonyms[counter].synonym == NULL) {
+      free_synonym(synonyms[counter]);
+      free_synonyms(synonyms, counter);
+      fclose(file);
+      *synonyms_count = 0;
+      return NULL;
+    }
+
+    token = strtok(NULL, "");
+    synonyms[counter].canonical = strdup(token);
+
+    if (synonyms[counter].canonical == NULL) {
+      free_synonym(synonyms[counter]);
+      free_synonyms(synonyms, counter);
+      fclose(file);
+      *synonyms_count = 0;
+      return NULL;
+    }
+
+    counter++;
+  }
+
+  *synonyms_count = counter;
+
+  if (fclose(file) != 0) {
+    printf("%sPHILIA:%s Dad? Don't get mad, okay? But I can't close synonyms.null, hehe.\n\n", BRIGHT_GREEN, RESET);
+    return synonyms;
+  }
+
+  return synonyms;
+}
+
+void canonalize_tokens(Tokens *t, Synonym *s, int synonyms_count) {
+  for (int i = 0; i < t->count; i++) {
+    for (int j = 0; j < synonyms_count; j++) {
+      if (strcmp(t->tokens[i].word, s[j].synonym) == 0) {
+        free(t->tokens[i].word);
+        t->tokens[i].word = strdup(s[j].canonical);
+        return;
+      }
+    }
+  }
+}
