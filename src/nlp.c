@@ -714,6 +714,9 @@ static Tokens tokenize_fact(Fact *f) {
   return t;
 }
 
+//========================================================================
+//                         INDEXED FACT
+//========================================================================
 void free_indexed_fact(IndexedFact *f, int indexedfacts_count) {
   if (f == NULL) 
     return;
