@@ -206,6 +206,24 @@ void normalize(char *prompt) {
 /*================================*/
 
 /*========TOKENIZING==============*/
+static bool is_contractor(char *s) {
+  if (strcmp(s, "s") == 0)
+    return true;
+
+  if (strcmp(s, "re") == 0)
+    return true;
+
+  if (strcmp(s, "ll") == 0)
+    return true;
+
+  if (strcmp(s, "d") == 0)
+    return true;
+
+  if (strcmp(s, "ve") == 0)
+    return true;
+
+  return false;
+}
 Tokens tokenize(char *input) {
   Tokens t;
 
@@ -229,6 +247,10 @@ Tokens tokenize(char *input) {
       }
 
       t.tokens = tmp;
+    }
+
+    if (is_contractor(token)) {
+      token = strtok(NULL, " .,'?!\":;");
     }
 
     t.tokens[t.count].word = strdup(token);
@@ -343,6 +365,7 @@ void free_tokens(Tokens *t) {
 
   t->tokens = NULL;
   t->count = 0;
+  t->success = false;
   t->capacity = 0;
 }
 
@@ -461,13 +484,32 @@ Action plan_action(Intent intent) {
 }
 
 /*=================ANSWERING=========================*/
+
+// helper function to score each fact
+static float score_fact(Query q, Fact f) {
+  float score = 0.0f;
+
+  if (strcmp(q.subject, f.subject) == 0)
+    score += SUBJECT_WEIGHT;
+
+  if (strcmp(q.attribute, f.attribute) == 0) 
+    score += ATTRIBUTE_WEIGHT;
+
+  return score;
+}
 Fact *search_knowledges(Query *q, Fact *knowledges, int count) {
+  float score = 0.0f;
+
+  Fact *f = NULL;
+
   for (int i = 0; i < count; i++) {
-    if (strcmp(q->subject, knowledges[i].subject) == 0 && strcmp(q->attribute, knowledges[i].attribute) == 0) {
-      return &knowledges[i];
-    }
+    score = 0.0f;
+    score = score_fact(*q, knowledges[i]);
+
+    if (score >= FACT_THRESHOLD)
+      f = &knowledges[i];
   }
-  return NULL;
+  return f;
 }
 
 void generate_response(Fact *fact) {
@@ -611,14 +653,99 @@ Synonym *load_synonyms(int *synonyms_count) {
   return synonyms;
 }
 
-void canonalize_tokens(Tokens *t, Synonym *s, int synonyms_count) {
+void canonicalize_tokens(Tokens *t, Synonym *s, int synonyms_count) {
   for (int i = 0; i < t->count; i++) {
     for (int j = 0; j < synonyms_count; j++) {
       if (strcmp(t->tokens[i].word, s[j].synonym) == 0) {
         free(t->tokens[i].word);
         t->tokens[i].word = strdup(s[j].canonical);
-        return;
+        break;
       }
     }
   }
+}
+
+//===================================================================
+//                    Tokenizing facts
+//                    Making IndexexFacts
+//==================================================================
+static Tokens tokenize_fact(Fact *f) {
+  Tokens t = {0};
+
+  t.count = 3;
+  t.capacity = 3;
+  t.success = false;
+
+  t.tokens = calloc(t.count, sizeof(Token));
+
+  if (t.tokens == NULL) {
+    printf("%sPHILIA:%s Aaaaahhhh, I failed to allocate memories for t.tokens in tokenize_fact() function, dadddd!\n\n", BRIGHT_GREEN, RESET);
+    free_tokens(&t);
+    return t;
+  }
+
+  for (int i = 0; i < t.count; i++) {
+    t.tokens[i].word = NULL;
+  }
+
+  t.tokens[0].word = strdup(f->subject);
+  if (t.tokens[0].word == NULL) {
+    printf("%sPHILIA:%s DADDD, I failed on strdup(f.subject) on tokenize_fact() function\n\n", BRIGHT_GREEN, RESET);
+    free_tokens(&t);
+    return t;
+  }
+
+  t.tokens[1].word = strdup(f->attribute);
+  if (t.tokens[1].word == NULL) {
+    printf("%sPHILIA:%s DADDD, I failed on strdup(f.attribute) on tokenize_fact() function\n\n", BRIGHT_GREEN, RESET);
+    free_tokens(&t);
+    return t;
+  }
+
+  t.tokens[2].word = strdup(f->value);
+  if (t.tokens[2].word == NULL) {
+    printf("%sPHILIA:%s DADDDD, I failed on strdup(f.value) on tokenize_fact() function\n\n", BRIGHT_GREEN, RESET);
+    free_tokens(&t);
+    return t;
+  }
+
+  t.success = true;
+
+  return t;
+}
+
+void free_indexed_fact(IndexedFact *f, int indexedfacts_count) {
+  if (f == NULL) 
+    return;
+
+  for (int i = 0; i < indexedfacts_count; i++) {
+    free_tokens(&(f[i].tokens));
+  }
+
+  free(f);
+  f = NULL;
+}
+
+IndexedFact *build_indexed_fact(Fact *knowledges, int knowledges_count, int *indexed_facts_count) {
+  IndexedFact *index = calloc(knowledges_count, sizeof(IndexedFact));
+
+  if (index == NULL) {
+    printf("%sPHILIA:%s DADDDD!! I can't allocate memory for IndexedFact inside the build_indexed_fact() function!!\n\n", BRIGHT_GREEN, RESET);
+    *indexed_facts_count = 0;
+    return NULL;
+  }
+
+  for (int i= 0; i < knowledges_count; i++) {
+    index[i].fact = &knowledges[i];
+    index[i].tokens = tokenize_fact(&knowledges[i]);
+
+    if (!index[i].tokens.success) {
+      free_indexed_fact(index, i + 1);
+      *indexed_facts_count = 0;
+      return NULL;
+    }
+  }
+  
+  *indexed_facts_count = knowledges_count;
+  return index;
 }
