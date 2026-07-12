@@ -1,7 +1,7 @@
-#include <stdio.h>
-
 #ifndef FILES_H
 #define FILES_H
+
+#include <stdio.h>
 
 #define LINE_MAX 4096
 

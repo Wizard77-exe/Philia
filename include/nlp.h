@@ -1,41 +1,18 @@
-#include <stdbool.h>
-
 #ifndef NLP_H
 #define NLP_H
 
-typedef struct {
-  float score;
-  char *word;
-} Token;
+#define SUBJECT_WEIGHT    1.0f
+#define ATTRIBUTE_WEIGHT  1.0f
+#define FACT_THRESHOLD (SUBJECT_WEIGHT + ATTRIBUTE_WEIGHT)
 
-typedef struct {
-  int count;
-  int capacity;
+#include <stdbool.h>
+#include "structures.h"
 
-  Token *tokens;
-
-  bool success;
-} Tokens;
-
-typedef struct {
-  int count;
-  int capacity;
-
-  Token *words;
-
-  bool success;
-} Keywords;
-
-typedef struct {
-  char *subject;
-  char *attribute;
-} Query;
-
-typedef struct {
-  char *subject;
-  char *attribute;
-  char *value;
-} Fact;
+typedef struct Token Token;
+typedef struct Tokens Tokens;
+typedef struct Keywords Keywords;
+typedef struct Query Query;
+typedef struct Fact Fact;
 
 typedef enum {
   INTENT_UNKNOWN,
@@ -57,10 +34,9 @@ typedef enum {
   ACTION_UPDATE         // for INTENT_UPDATE
 } Action;
 
-typedef struct {
-  char *synonym;
-  char *canonical;
-} Synonym;
+typedef struct Synonym Synonym;
+
+typedef struct IndexedFact IndexedFact;
 
 void free_fact(Fact f);
 
@@ -75,7 +51,7 @@ void normalize(char *prompt);
 void free_tokens(Tokens *tokens);
 void free_keywords(Keywords *k);
 void free_query(Query *q);
-Tokens tokenize(char *token);
+Tokens tokenize(char *input);
 void score_tokens(Tokens *t, char **subjects, int subjects_count, char **attributes, int attributes_count);
 Keywords extract_keywords(Tokens *t);
 Query detect_query(Keywords *k, char **subjects, int subjects_count, char **attributes, int attributes_count);
@@ -94,5 +70,8 @@ void free_synonyms(Synonym *s, int synonyms_count);
 
 Synonym *load_synonyms(int *synonyms_count);
 
-void canonalize_tokens(Tokens *t, Synonym *s, int synonyms_count);
+void canonicalize_tokens(Tokens *t, Synonym *s, int synonyms_count);
+
+void free_indexed_fact(IndexedFact *f, int indexedfacts_count);
+IndexedFact *build_indexed_fact(Fact *knowledges, int knowledges_count, int *indexed_facts_count);
 #endif

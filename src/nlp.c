@@ -665,55 +665,6 @@ void canonicalize_tokens(Tokens *t, Synonym *s, int synonyms_count) {
   }
 }
 
-//===================================================================
-//                    Tokenizing facts
-//                    Making IndexexFacts
-//==================================================================
-static Tokens tokenize_fact(Fact *f) {
-  Tokens t = {0};
-
-  t.count = 3;
-  t.capacity = 3;
-  t.success = false;
-
-  t.tokens = calloc(t.count, sizeof(Token));
-
-  if (t.tokens == NULL) {
-    printf("%sPHILIA:%s Aaaaahhhh, I failed to allocate memories for t.tokens in tokenize_fact() function, dadddd!\n\n", BRIGHT_GREEN, RESET);
-    free_tokens(&t);
-    return t;
-  }
-
-  for (int i = 0; i < t.count; i++) {
-    t.tokens[i].word = NULL;
-  }
-
-  t.tokens[0].word = strdup(f->subject);
-  if (t.tokens[0].word == NULL) {
-    printf("%sPHILIA:%s DADDD, I failed on strdup(f.subject) on tokenize_fact() function\n\n", BRIGHT_GREEN, RESET);
-    free_tokens(&t);
-    return t;
-  }
-
-  t.tokens[1].word = strdup(f->attribute);
-  if (t.tokens[1].word == NULL) {
-    printf("%sPHILIA:%s DADDD, I failed on strdup(f.attribute) on tokenize_fact() function\n\n", BRIGHT_GREEN, RESET);
-    free_tokens(&t);
-    return t;
-  }
-
-  t.tokens[2].word = strdup(f->value);
-  if (t.tokens[2].word == NULL) {
-    printf("%sPHILIA:%s DADDDD, I failed on strdup(f.value) on tokenize_fact() function\n\n", BRIGHT_GREEN, RESET);
-    free_tokens(&t);
-    return t;
-  }
-
-  t.success = true;
-
-  return t;
-}
-
 //========================================================================
 //                         INDEXED FACT
 //========================================================================
@@ -737,10 +688,15 @@ IndexedFact *build_indexed_fact(Fact *knowledges, int knowledges_count, int *ind
     *indexed_facts_count = 0;
     return NULL;
   }
+  
+  char buffer[512];
 
   for (int i= 0; i < knowledges_count; i++) {
     index[i].fact = &knowledges[i];
-    index[i].tokens = tokenize_fact(&knowledges[i]);
+
+    snprintf(buffer, sizeof(buffer), "%s %s %s", knowledges[i].subject, knowledges[i].attribute, knowledges[i].value);
+    normalize(buffer);
+    index[i].tokens = tokenize(buffer);               // REMEMBER TO FREE EACH TOKENS OF THE INDEXED_FACT NOW.
 
     if (!index[i].tokens.success) {
       free_indexed_fact(index, i + 1);

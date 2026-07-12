@@ -63,11 +63,7 @@ Templates_Map templates[] = {
   },
   {
     .subject = "father",
-    .attribute = "age",
-    .templates = father_age_templates,
-    .templates_count = 5
-  }
-};
+    .attribute = "age"
 
 int templates_count = 4;
 
