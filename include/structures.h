@@ -8,6 +8,9 @@ struct Term {
   char *word;
   int frequency;
   float tf;
+  float idf;
+
+  float tf_idf;
 };
 
 struct DocumentTerms {

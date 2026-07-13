@@ -15,6 +15,10 @@ DocumentTerms compute_tf(Tokens tokens);
 void compute_indexedFact_tf(IndexedFact *f, int count);
 
 void free_vocabulary(Vocabulary *v);
+int vocabulary_index(Vocabulary v, const char *word);
 Vocabulary build_vocabulary(IndexedFact *facts, int count);
+void compute_idf(Vocabulary *v, int N);
+void apply_idf(IndexedFact *facts, int indexedFact_count, Vocabulary v);
+void compute_tfidf(IndexedFact *facts, int indexedFact_count);
 
 #endif

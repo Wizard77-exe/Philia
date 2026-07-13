@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <math.h>
 
 #include "tf_idf.h"
 #include "nlp.h"
+#include "stdphilia.h"
 
 static int is_in_documentTerms(DocumentTerms dt, char *word) {
   for (int i = 0; i < dt.count; i++) {
@@ -90,7 +92,7 @@ void free_vocabulary(Vocabulary *v) {
   v->success = false;
 }
 
-static int is_in_vocabulary(Vocabulary v, const char *word) {
+int vocabulary_index(Vocabulary v, const char *word) {
   for (int i = 0; i < v.count; i++) {
     if (strcmp(word, v.terms[i].word) == 0)
       return i;
@@ -110,7 +112,7 @@ Vocabulary build_vocabulary(IndexedFact *facts, int count) {
   }
 
   for (int i = 0; i < count; i++) {                               // for each IndexedFact.
-    for (int j = 0; j < facts[i].terms.count; j++) {        // for each word in the documentTerms
+    for (int j = 0; j < facts[i].terms.count; j++) {              // for each word in the documentTerms
       if (v.count >= v.capacity) {
         int old_capacity = v.capacity;
         v.capacity *= 2;
@@ -124,7 +126,7 @@ Vocabulary build_vocabulary(IndexedFact *facts, int count) {
         memset(v.terms + old_capacity, 0, (v.capacity - old_capacity) * sizeof(VocabularyTerm));
       }
 
-      int index = is_in_vocabulary(v, facts[i].terms.terms[j].word);
+      int index = vocabulary_index(v, facts[i].terms.terms[j].word);
 
       if (index >= 0) {
         v.terms[index].df += 1;
@@ -143,4 +145,33 @@ Vocabulary build_vocabulary(IndexedFact *facts, int count) {
   }
 
   return v;
+}
+
+void compute_idf(Vocabulary *v, int N) {
+  for (int i = 0; i < v->count; i++) {
+    v->terms[i].idf = (float)(log((float)N / (float)v->terms[i].df));
+  }
+}
+
+void apply_idf(IndexedFact *facts, int indexedFact_count, Vocabulary v) {
+  for (int i = 0; i < indexedFact_count; i++) {
+    for (int j = 0; j < facts[i].terms.count; j++) {
+      int idx = vocabulary_index(v, facts[i].terms.terms[j].word);
+
+      if (idx == -1) {
+        printf("%sPHILIA:%s Can't copy this IDF from the vocabularies because the term doesn't exists in the IndexedFacts tokens, hehe.\n\n", BRIGHT_GREEN, RESET);
+        continue;
+      }
+
+      facts[i].terms.terms[j].idf = v.terms[idx].idf;
+    }
+  }
+}
+
+void compute_tfidf(IndexedFact *facts, int indexedFact_count) {
+  for (int i = 0; i < indexedFact_count; i++) {
+    for (int j = 0; j < facts[i].terms.count; j++) {
+      facts[i].terms.terms[j].tf_idf = facts[i].terms.terms[j].tf * facts[i].terms.terms[j].idf;
+    }
+  }
 }
