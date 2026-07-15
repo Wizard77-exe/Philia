@@ -4,7 +4,7 @@ CFLAGS = -g -Wall -Wextra -Iinclude
 SRC = $(wildcard src/*.c)
 OBJ = $(patsubst src/%.c,build/obj/%.o,$(SRC))
 
-TARGET = build/philia
+TARGET = ./try
 
 $(TARGET): $(OBJ)
 	$(CC) $(OBJ) -o $@

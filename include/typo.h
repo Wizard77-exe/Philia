@@ -1,7 +1,7 @@
-#include "nlp.h"
-
 #ifndef TYPO_H
 #define TYPO_H
+
+#include "structures.h"
 
 typedef struct {
   int count;
@@ -9,6 +9,5 @@ typedef struct {
 } Dictionary;
 
 void recover_typos(Tokens *t, Dictionary *d);
-char **load_dictionary(int *dictionary_count);
 
 #endif

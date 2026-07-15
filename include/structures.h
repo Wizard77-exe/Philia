@@ -4,77 +4,69 @@
 #include <stdbool.h>
 
 // from TF_IDF
-struct Term {
+typedef struct Term {
   char *word;
   int frequency;
   float tf;
   float idf;
 
   float tf_idf;
-};
+} Term;
 
-struct DocumentTerms {
+typedef struct DocumentTerms {
   struct Term *terms;
   int count;
   bool success;
-};
+} DocumentTerms;
 
-struct VocabularyTerm {
+typedef struct VocabularyTerm {
   char *word;
   float idf;
   int df;
-};
+} VocabularyTerm;
 
-struct Vocabulary {
-  struct VocabularyTerm *terms;
+typedef struct Vocabulary {
+  VocabularyTerm *terms;
   int count;
   int capacity;
   bool success;
-};
+} Vocabulary;
 // from NLP
-struct Token {
+typedef struct Token {
   float score;
   char *word;
-};
+} Token;
 
-struct Tokens {
-  struct Token *tokens;
-
-  int count;
-  int capacity;
-
-  bool success;
-};
-
-struct Keywords{
-  struct Token *words;
+typedef struct Tokens {
+  Token *tokens;
 
   int count;
   int capacity;
 
   bool success;
-};
+} Tokens;
 
-struct Query {
-  char *subject;
-  char *attribute;
-};
-
-struct Fact {
+typedef struct Fact {
   char *subject;
   char *attribute;
   char *value;
-};
+} Fact;
 
-struct IndexedFact {
-  struct Tokens tokens;
-  struct DocumentTerms terms;
-  struct Fact *fact;
-};
+typedef struct IndexedFact {
+  Tokens tokens;
+  DocumentTerms terms;
+  Fact *fact;
+} IndexedFact;
 
-struct Synonym {
+typedef struct Synonym {
   char *synonym;
   char *canonical;
-};
+} Synonym;
+
+// Query Representation
+typedef struct Query {
+  Tokens tokens;
+  DocumentTerms terms;
+} Query;
 
 #endif
