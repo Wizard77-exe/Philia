@@ -1,3 +1,4 @@
+```text
 ██████╗ ██╗  ██╗██╗██╗     ██╗ █████╗
 ██╔══██╗██║  ██║██║██║     ██║██╔══██╗
 ██████╔╝███████║██║██║     ██║███████║
@@ -5,9 +6,9 @@
 ██║     ██║  ██║██║███████╗██║██║  ██║
 ╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝╚═╝  ╚═╝
 
-          A chatbot built from scratch in C.
+        A chatbot built entirely in C.
       "As Philia grows, so do I."
-
+```
 # Philia
 
 > *"She started as a simple chatbot. She became my way of learning Computer Science."*
