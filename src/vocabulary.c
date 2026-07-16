@@ -60,7 +60,7 @@ Vocabulary build_vocabulary(IndexedFact *facts, int count) {
       v.count++;
     }
   }
-
+  v.success = true;
   return v;
 }
 

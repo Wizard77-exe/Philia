@@ -8,4 +8,6 @@ IndexedFact *build_indexed_fact(Fact *knowledges, int knowledges_count, int *ind
 void apply_indexedFacts_idf(IndexedFact *facts, int count, Vocabulary v);
 void compute_indexedFacts_tfidf(IndexedFact *facts, int count);
 
+void compute_indexedFacts_magnitude(IndexedFact *facts, int count);
+
 #endif

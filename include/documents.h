@@ -8,4 +8,6 @@ DocumentTerms compute_tf(Tokens tokens);
 void apply_idf(DocumentTerms *dt, Vocabulary v);
 void compute_tfidf(DocumentTerms *dt);
 
+void compute_magnitude(DocumentTerms *dt);
+
 #endif

@@ -51,3 +51,9 @@ void compute_indexedFacts_tfidf(IndexedFact *facts, int count) {
     compute_tfidf(&facts[i].terms);
   }
 }
+
+void compute_indexedFacts_magnitude(IndexedFact *facts, int count) {
+  for (int i = 0; i < count; i++) {
+    compute_magnitude(&facts[i].terms);
+  }
+}

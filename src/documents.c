@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "structures.h"
 #include "setfree.h"
@@ -69,4 +70,14 @@ void compute_tfidf(DocumentTerms *dt) {
   for (int i = 0; i < dt->count; i++) {
     dt->terms[i].tf_idf = dt->terms[i].tf * dt->terms[i].idf;
   }
+}
+
+void compute_magnitude(DocumentTerms *dt) {
+  float sum_squared_components = 0.0f;
+
+  for (int i = 0; i < dt->count; i++) {
+    sum_squared_components += (float)((float)dt->terms[i].tf_idf * (float)dt->terms[i].tf_idf);
+  }
+
+  dt->magnitude = (float)sqrt(sum_squared_components);
 }

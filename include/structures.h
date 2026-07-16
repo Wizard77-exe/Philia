@@ -16,6 +16,7 @@ typedef struct Term {
 typedef struct DocumentTerms {
   struct Term *terms;
   int count;
+  float magnitude;
   bool success;
 } DocumentTerms;
 
