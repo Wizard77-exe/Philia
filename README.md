@@ -1,12 +1,12 @@
 ```text
-██████╗ ██╗  ██╗██╗██╗     ██╗ █████╗
-██╔══██╗██║  ██║██║██║     ██║██╔══██╗
-██████╔╝███████║██║██║     ██║███████║
-██╔═══╝ ██╔══██║██║██║     ██║██╔══██║
-██║     ██║  ██║██║███████╗██║██║  ██║
-╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝╚═╝  ╚═╝
+                   ██████╗ ██╗  ██╗██╗██╗     ██╗ █████╗
+                   ██╔══██╗██║  ██║██║██║     ██║██╔══██╗
+                   ██████╔╝███████║██║██║     ██║███████║
+                   ██╔═══╝ ██╔══██║██║██║     ██║██╔══██║
+                   ██║     ██║  ██║██║███████╗██║██║  ██║
+                   ╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝╚═╝  ╚═╝
 
-        A chatbot built entirely in C.
+          A chatbot built from scratch in C.
       "As Philia grows, so do I."
 ```
 # Philia
@@ -85,7 +85,28 @@ IDF
 TF-IDF
     │
     ▼
-Cosine Similarity (In Progress)
+Cosine Similarity
+    |
+    ▼
+Context Window
+    |
+    ▼
+EmbeddingVector and EmbeddingMatrix
+    |
+    ▼
+SkipGram Model
+    |
+    ▼
+SkipGram ForwardPass
+    |
+    ▼
+SoftMax
+    |
+    ▼
+Cross Entropy Loss
+    |
+    ▼
+BackPropagation (In Progress)
 ```
 
 Future versions will include embeddings, semantic search, and eventually transformer-based reasoning.
