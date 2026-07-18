@@ -3,42 +3,15 @@
 
 #include <stdbool.h>
 
+#define WINDOW_SIZE   2
+#define EMBEDDING_DIM 64
+
 // from TF_IDF
-typedef struct Term {
+typedef struct {
   char *word;
-  int frequency;
-  float tf;
-  float idf;
-
-  float tf_idf;
-} Term;
-
-typedef struct DocumentTerms {
-  struct Term *terms;
-  int count;
-  float magnitude;
-  bool success;
-} DocumentTerms;
-
-typedef struct VocabularyTerm {
-  char *word;
-  float idf;
-  int df;
-} VocabularyTerm;
-
-typedef struct Vocabulary {
-  VocabularyTerm *terms;
-  int count;
-  int capacity;
-  bool success;
-} Vocabulary;
-// from NLP
-typedef struct Token {
-  float score;
-  char *word;
+  int id;
 } Token;
-
-typedef struct Tokens {
+typedef struct {
   Token *tokens;
 
   int count;
@@ -47,27 +20,106 @@ typedef struct Tokens {
   bool success;
 } Tokens;
 
-typedef struct Fact {
-  char *subject;
-  char *attribute;
-  char *value;
-} Fact;
+typedef struct {
+    char *word;
 
-typedef struct IndexedFact {
-  Tokens tokens;
-  DocumentTerms terms;
-  Fact *fact;
-} IndexedFact;
+    int frequency;
+    int id;
 
-typedef struct Synonym {
-  char *synonym;
-  char *canonical;
-} Synonym;
+    float tf;
+    float idf;
+    float tf_idf;
+} DocumentTerm;
+
+typedef struct {
+    DocumentTerm *terms;
+
+    float magnitude;
+
+    int count;
+    int capacity;
+
+    bool success;
+} Document;
+
+typedef struct {
+  int df;
+  int id;
+
+  float idf;
+
+  char *word;
+} VocabularyTerm;
+
+typedef struct {
+    VocabularyTerm *terms;
+
+    int count;
+    int capacity;
+
+    bool success;
+} Vocabulary;
+
+typedef struct {
+    Document *documents;
+    Tokens *tokens;
+
+    int documents_count;
+    int documents_capacity;
+
+    Vocabulary vocabulary;
+} Corpus;
+
+typedef struct {
+  int center;
+  int context;
+} TrainingPair;
+
+typedef struct {
+  TrainingPair *pairs;
+
+  int count;
+  int capacity;
+
+  bool success;
+} TrainingSet;
+
+typedef struct {
+  float *values;
+} EmbeddingVector;
+
+typedef struct {
+  EmbeddingVector *vectors;
+
+  int vocabulary_size;
+  int dimension;
+
+  bool success;
+} EmbeddingMatrix;
+
+typedef struct {
+  EmbeddingMatrix input;
+  EmbeddingMatrix output;
+
+  int vocabulary_size;
+  int embedding_dim;
+
+  bool success;
+} SkipGram;
+
+typedef struct {
+  float *logits;
+  float *probabilities;
+
+  int vocabulary_size;
+
+  bool success;
+} ForwardPass;
 
 // Query Representation
 typedef struct Query {
   Tokens tokens;
-  DocumentTerms terms;
+  Document terms;
 } Query;
 
 #endif

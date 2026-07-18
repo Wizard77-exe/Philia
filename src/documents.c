@@ -7,7 +7,7 @@
 #include "setfree.h"
 #include "vocabulary.h"
 
-static int is_in_documentTerms(DocumentTerms dt, const char *word) {
+static int is_in_documentTerms(Document dt, const char *word) {
   for (int i = 0; i < dt.count; i++) {
     if (strcmp(dt.terms[i].word, word) == 0)
       return i;
@@ -16,13 +16,13 @@ static int is_in_documentTerms(DocumentTerms dt, const char *word) {
   return -1;
 }
 
-DocumentTerms compute_tf(Tokens tokens) {
-  DocumentTerms dt = {0};
+Document compute_tf(Tokens tokens) {
+  Document dt = {0};
 
-  dt.terms = calloc(tokens.count, sizeof(Term));
+  dt.terms = calloc(tokens.count, sizeof(DocumentTerm));
 
   if (dt.terms == NULL) {
-    free_DT(&dt);
+    // ;
     return dt;
   }
 
@@ -37,7 +37,7 @@ DocumentTerms compute_tf(Tokens tokens) {
     dt.terms[dt.count].word = strdup(tokens.tokens[i].word);
 
     if (dt.terms[dt.count].word == NULL) {
-      free_DT(&dt);
+      //free_DT(&dt);
       return dt;
     }
 
@@ -50,34 +50,57 @@ DocumentTerms compute_tf(Tokens tokens) {
   return dt;
 }
 
-void apply_idf(DocumentTerms *dt, Vocabulary v) {
-  for (int i = 0; i < dt->count; i++) {
-    for (int j = 0; j < v.count; j++) {
-      int idx = vocabulary_index(v, dt->terms[i].word);
+void apply_idf(Document *docs, int count, Vocabulary v) {
+  for (int i = 0; i < count; i++) {
+    for (int j = 0; j < docs[i].count; j++) {
+      int idx = vocabulary_index(v, docs[i].terms[j].word);
 
       if (idx == -1) {
-        // tell something
-        dt->terms[i].idf = 0.0f;
+        docs[i].terms[j].idf = 0.0f;
         continue;
       }
 
-      dt->terms[i].idf = v.terms[idx].idf;
+      docs[i].terms[j].idf = v.terms[idx].idf;
     }
   }
 }
 
-void compute_tfidf(DocumentTerms *dt) {
-  for (int i = 0; i < dt->count; i++) {
-    dt->terms[i].tf_idf = dt->terms[i].tf * dt->terms[i].idf;
+void compute_tfidf(Document *docs, int count) {
+  for (int i = 0; i < count; i++) {
+    for (int j = 0; j < docs[i].count; j++) {
+      docs[i].terms[j].tf_idf = docs[i].terms[j].tf * docs[i].terms[j].idf;
+    }
   }
 }
 
-void compute_magnitude(DocumentTerms *dt) {
-  float sum_squared_components = 0.0f;
+void document_magnitude(Document *docs, int count) {
+  for (int i = 0; i < count; i++) {
+    float sum_squared_components = 0.0f;
+    for (int j = 0; j < docs[i].count; j++) {
+      sum_squared_components += (float)((float)docs[i].terms[j].tf_idf * (float)docs[i].terms[j].tf_idf);
+    }
 
-  for (int i = 0; i < dt->count; i++) {
-    sum_squared_components += (float)((float)dt->terms[i].tf_idf * (float)dt->terms[i].tf_idf);
+    docs[i].magnitude = (float)sqrt(sum_squared_components);
   }
+}
 
-  dt->magnitude = (float)sqrt(sum_squared_components);
+double document_dot_product(Document *a, Document *b) {
+  double dot_product = 0.0;
+
+  for (int i = 0; i < a->count; i++) {
+    for (int j = 0; j < b->count; j++) {
+      if (strcmp(a->terms[i].word, b->terms[j].word) == 0) {
+        dot_product += a->terms[i].tf_idf * b->terms[j].tf_idf;
+        break;
+      }
+    }
+  }
+  return dot_product;
+}
+
+double document_cosine_similarity(Document a, Document b) {
+  double dot_product = document_dot_product(&a, &b);
+  double cos_sim = dot_product / (a.magnitude * b.magnitude);
+
+  return cos_sim;
 }

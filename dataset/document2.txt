@@ -1,0 +1,6 @@
+eleanor teaches programming.
+
+eleanor likes c.
+eleanor likes operating systems.
+linux is powerful.
+hello world from eleanor.

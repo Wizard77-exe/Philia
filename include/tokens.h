@@ -4,5 +4,6 @@
 #include "structures.h"
 
 Tokens tokenize(char *input);
+Tokens tokenize_file(const char *filename);
 
 #endif

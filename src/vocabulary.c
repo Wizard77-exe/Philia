@@ -16,7 +16,7 @@ int vocabulary_index(Vocabulary v, const char *word) {
   return -1;
 }
 
-Vocabulary build_vocabulary(IndexedFact *facts, int count) {
+Vocabulary build_vocabulary(Document *documents, int count) {
   Vocabulary v = {0};
   v.capacity = 16;
 
@@ -27,7 +27,7 @@ Vocabulary build_vocabulary(IndexedFact *facts, int count) {
   }
 
   for (int i = 0; i < count; i++) {
-    for (int j = 0; j < facts[i].terms.count; j++) {
+    for (int j = 0; j < documents[i].count; j++) {
       if (v.count >= v.capacity) {
         int old_capacity = v.capacity;
         v.capacity *= 2;
@@ -43,20 +43,22 @@ Vocabulary build_vocabulary(IndexedFact *facts, int count) {
         memset(v.terms + old_capacity, 0, (v.capacity - old_capacity) * sizeof(VocabularyTerm));
       }
 
-      int index = vocabulary_index(v, facts[i].terms.terms[j].word);
+      int index = vocabulary_index(v, documents[i].terms[j].word);
 
       if (index >= 0) {
         v.terms[index].df += 1;
         continue;
       }
 
-      v.terms[v.count].word = strdup(facts[i].terms.terms[j].word);
+      v.terms[v.count].word = strdup(documents[i].terms[j].word);
       if (v.terms[v.count].word == NULL) {
         free_vocabulary(&v);
         return v;
       }
 
       v.terms[v.count].df = 1;
+      v.terms[v.count].id = v.count;
+
       v.count++;
     }
   }
