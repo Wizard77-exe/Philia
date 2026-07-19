@@ -65,8 +65,6 @@ void softmax(ForwardPass *forward) {
     sum += forward->probabilities[i];
   }
 
-  printf("Sum: %.6f\n", sum);
-
   for (int i = 0; i < forward->vocabulary_size; i++) {
     forward->probabilities[i] /= sum;
   }

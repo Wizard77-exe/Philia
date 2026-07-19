@@ -113,3 +113,21 @@ void free_forwardpass(ForwardPass *fp) {
   fp->vocabulary_size = 0;
   fp->success = false;
 }
+
+// NOTE: for freeing ExpectedDistribution
+void free_expected_distribution(ExpectedDistribution *expected) {
+  free(expected->expected);
+
+  expected->expected = NULL;
+  expected->vocabulary_size = 0;
+  expected->success = false;
+}
+
+// NOTE: for freeing BackwardPass
+void free_backwardpass(BackwardPass *backward) {
+  free(backward->gradients);
+
+  backward->gradients = NULL;
+  backward->vocabulary_size = 0;
+  backward->success = false;
+}

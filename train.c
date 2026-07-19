@@ -12,6 +12,7 @@
 #include "embedding.h"
 #include "skipgram.h"
 #include "loss.h"
+#include "backpropagation.h"
 
 int main() {
 
@@ -58,75 +59,108 @@ int main() {
     return 1;
   }
 
-  ForwardPass fp = forward_skipgram(&model, ts.pairs[3].center);
-  if (!fp.success) {
-    printf("Error creating ForwardPass\n");
-    free_embedding_matrix(&matrix);
-    free_corpus(&t);
-    free_training_set(&ts);
-    free_skipgram(&model);
-    return 1;
-  }
+  int sample = 0;   // one training pair
 
-  softmax(&fp);
+printf("===============================================\n");
+printf("BEFORE TRAINING\n");
+printf("===============================================\n");
 
-  float sum = 0.0f;
+ForwardPass before =
+    forward_skipgram(&model, ts.pairs[sample].center);
 
-  for (int i = 0; i < fp.vocabulary_size; i++) {
-    printf("Logits: %-30.6f Probability: %-70.6f\n", fp.logits[i], fp.probabilities[i]);
-    sum += fp.probabilities[i];
-  }
-  
-  printf("Sum: %f\n", sum);
+softmax(&before);
 
-  float loss = compute_cross_entropy_loss(&fp, ts.pairs[3].context);
+float loss_before =
+    compute_cross_entropy_loss(
+        &before,
+        ts.pairs[sample].context
+    );
 
-  printf("Cross Entropy Loss: %f\n", loss);
-  /*for (int i = 0; i < fp.vocabulary_size; i++) {
-    printf("Input: 15 Output: %3d Logits: %20.6f\n", i+1, fp.logits[i]);
-  }
-  /*for (int i = 0; i < model.vocabulary_size; i++) {
-    for (int j = 0; j < model.embedding_dim; j++) {
-      printf("Input: %.6f               Output: %.6f\n", model.input.vectors[i].values[j], model.output.vectors[i].values[j]);
-    }
-  }
-  /*printf("Cosine Similarity of 15 and 10: %.6f\n", cosine_similarity);
+printf("Center : %s\n",
+       t.vocabulary.terms[ts.pairs[sample].center].word);
 
-  EmbeddingVector *v = get_embedding(&matrix, 26);
-  if (v == NULL) {
-    printf("get_embedding() returned a NULL\n");
-    free_embedding_matrix(&matrix);
-    free_corpus(&t);
-    free_training_set(&ts);
-    return 1;
-  }
+printf("Target : %s\n",
+       t.vocabulary.terms[ts.pairs[sample].context].word);
 
-  /*for (int i = 0; i < EMBEDDING_DIM; i++) {
-    printf("#%d == %.6f\n", i + 1, v->values[i]);
-  }
-  /*for (int i = 0; i < matrix.vocabulary_size; i++) {
-    for (int j = 0; j < matrix.dimension; j++) {
-      printf("%.6f \n", matrix.vectors[i].values[j]);
-    }
-    printf("\n");
-  }
+printf("Loss Before : %f\n", loss_before);
 
-  for (int i = 0; i < t.documents_count; i++) {
-    printf("Documents #%d\n", i+1);
-    for (int j = 0; j < t.documents[i].count; j++) {
-      printf("%s\n", t.documents[i].terms[j].word);
-    }
-    printf("\n");
-  }
+printf("\n");
 
-  for (int i = 0; i < ts.count; i++) {
-    printf("(\"%s\", \"%s\")\n", t.vocabulary.terms[ts.pairs[i].center].word, t.vocabulary.terms[ts.pairs[i].context].word);
-  }*/
+ExpectedDistribution expected =
+    create_expected_distribution(
+        before.vocabulary_size,
+        ts.pairs[sample].context
+    );
+
+BackwardPass backward =
+    backward_skipgram(
+        &before,
+        &expected
+    );
+
+/* ---------- DEBUG ---------- */
+
+printf("Input Embedding Before:\n");
+for (int d = 0; d < 5; d++)
+    printf("%f ", model.input.vectors[ts.pairs[sample].center].values[d]);
+printf("\n");
+
+printf("Output Embedding Before:\n");
+for (int d = 0; d < 5; d++)
+    printf("%f ", model.output.vectors[ts.pairs[sample].context].values[d]);
+printf("\n\n");
+
+/* ---------- LEARNING ---------- */
+
+gradient_descent(
+    &model,
+    &backward,
+    ts.pairs[sample].center,
+    LEARNING_RATE
+);
+
+/* ---------- DEBUG ---------- */
+
+printf("Input Embedding After:\n");
+for (int d = 0; d < 5; d++)
+    printf("%f ", model.input.vectors[ts.pairs[sample].center].values[d]);
+printf("\n");
+
+printf("Output Embedding After:\n");
+for (int d = 0; d < 5; d++)
+    printf("%f ", model.output.vectors[ts.pairs[sample].context].values[d]);
+printf("\n\n");
+
+/* ---------- VERIFY ---------- */
+
+ForwardPass after =
+    forward_skipgram(&model, ts.pairs[sample].center);
+
+softmax(&after);
+
+float loss_after =
+    compute_cross_entropy_loss(
+        &after,
+        ts.pairs[sample].context
+    );
+
+printf("===============================================\n");
+printf("AFTER TRAINING\n");
+printf("===============================================\n");
+
+printf("Loss After : %f\n", loss_after);
+
+printf("Difference : %f\n", loss_before - loss_after);
+
+free_forwardpass(&before);
+free_forwardpass(&after);
+free_expected_distribution(&expected);
+free_backwardpass(&backward);
 
   
 
   // NOTE: freeing area;
-  free_forwardpass(&fp);
+  //free_forwardpass(&fp);
   free_skipgram(&model);
   free_embedding_matrix(&matrix);
   free_corpus(&t);

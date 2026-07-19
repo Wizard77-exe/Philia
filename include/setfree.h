@@ -30,4 +30,10 @@ void free_skipgram(SkipGram *model);
 // NOTE: For freeing the ForwardPass;
 void free_forwardpass(ForwardPass *fp);
 
+// NOTE: For freeing the ExpectedDistribution
+void free_expected_distribution(ExpectedDistribution *expected);
+
+// NOTE: For freeing the BackwardPass
+void free_backwardpass(BackwardPass *backward);
+
 #endif

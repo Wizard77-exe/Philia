@@ -5,6 +5,7 @@
 
 #define WINDOW_SIZE   2
 #define EMBEDDING_DIM 64
+#define LEARNING_RATE 0.025f
 
 // from TF_IDF
 typedef struct {
@@ -115,6 +116,22 @@ typedef struct {
 
   bool success;
 } ForwardPass;
+
+typedef struct {
+  float *expected;
+
+  int vocabulary_size;
+
+  bool success;
+} ExpectedDistribution;
+
+typedef struct {
+  float *gradients;
+
+  int vocabulary_size;
+
+  bool success;
+} BackwardPass;
 
 // Query Representation
 typedef struct Query {

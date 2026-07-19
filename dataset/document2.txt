@@ -4,3 +4,5 @@ eleanor likes c.
 eleanor likes operating systems.
 linux is powerful.
 hello world from eleanor.
+Eleanor loves programming
+eleanor loves jaypee
