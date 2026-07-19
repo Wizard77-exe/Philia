@@ -5,7 +5,8 @@
 
 #define WINDOW_SIZE   2
 #define EMBEDDING_DIM 64
-#define LEARNING_RATE 0.025f
+#define LEARNING_RATE 0.01f
+#define EPOCHS        1000
 
 // from TF_IDF
 typedef struct {
