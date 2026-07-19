@@ -6,8 +6,8 @@
                    ██║     ██║  ██║██║███████╗██║██║  ██║
                    ╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝╚═╝  ╚═╝
 
-          A chatbot built from scratch in C.
-      "As Philia grows, so do I."
+                    A chatbot built from scratch in C.
+                    "As Philia grows, so do I."
 ```
 # Philia
 
