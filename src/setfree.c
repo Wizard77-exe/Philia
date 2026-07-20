@@ -38,6 +38,7 @@ void free_document(Document *d) {
   }
 
   free(d->terms);
+  free(d->embeddings);
   d->terms = NULL;
   d->count = 0;
   d->capacity = 0;

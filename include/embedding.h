@@ -13,4 +13,8 @@ float embedding_cosine_similarity(const EmbeddingVector *a, const EmbeddingVecto
 
 EmbeddingVector *get_embedding(EmbeddingMatrix *matrix, int word_id);
 
+float dot_product(float *a, float *b, int dim);
+float get_magnitude(float *vector, int dim);
+float cosine_similarity(float *a, float *b, int dim);
+
 #endif

@@ -1,0 +1,13 @@
+Linux is an operating system preferred by many developers. 
+Jaypee enjoys using Arch Linux because it allows complete control over the environment. 
+Philia asks Eleanor why programmers enjoy Linux. 
+Eleanor explains that Linux offers powerful command line tools, scripting, package management, and development environments. 
+Jaypee writes software using gcc and Makefiles. 
+Philia watches programs compile into executable files. 
+Eleanor explains linking, libraries, headers, and object files. 
+Programming requires patience because debugging often takes longer than writing code. 
+Philia learns that every error message contains useful information. 
+Jaypee reads compiler warnings carefully instead of ignoring them. 
+Eleanor teaches Philia that warnings often reveal future bugs. 
+Philia enjoys experimenting with algorithms because experimentation develops intuition. 
+Linux becomes associated with programming, terminals, development, and learning.

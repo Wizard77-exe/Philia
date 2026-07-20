@@ -1,5 +1,14 @@
-programming in c is enjoyable.
-
-linux and c work well together.
-artificial intelligence needs data.
-philia and eleanor love programming.
+Artificial intelligence depends on data. 
+Eleanor teaches Philia that language models learn patterns instead of memorizing isolated facts. 
+Jaypee prepares datasets containing many documents about programming, Linux, mathematics, and daily conversations. 
+Philia studies these documents carefully. 
+Eleanor explains that words appearing together frequently usually become semantically related. 
+Programming appears near C, compiler, Linux, debugging, memory, pointers, algorithms, and software. 
+Family appears near mother, daughter, Jaypee, Eleanor, Philia, love, friendship, and trust. 
+Philia begins recognizing these relationships. 
+Jaypee smiles whenever Philia correctly connects related concepts. 
+Eleanor explains that embeddings transform words into vectors. 
+Similar meanings produce similar vectors. 
+Philia realizes that mathematics allows language to become geometry. 
+Jaypee believes this idea is beautiful because numbers represent meaning without storing explicit definitions. 
+Eleanor reminds Philia that understanding grows slowly through repeated practice.

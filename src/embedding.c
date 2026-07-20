@@ -82,3 +82,30 @@ EmbeddingVector *get_embedding(EmbeddingMatrix *matrix, int word_id) {
 
   return &matrix->vectors[word_id];
 }
+
+float dot_product(float *a, float *b, int dim) {
+  float dot_product = 0.0f;
+
+  for (int i = 0; i < dim; i++) {
+    dot_product += a[i] * b[i];
+  }
+
+  return dot_product;
+}
+
+float get_magnitude(float *vector, int dim) {
+  float magnitude = 0.0f;
+
+  for (int i = 0; i < dim; i++) {
+    magnitude += vector[i] * vector[i];
+  }
+  return magnitude;
+}
+
+float cosine_similarity(float *a, float *b, int dim) {
+  float magnitude_a = get_magnitude(a, dim);
+  float magnitude_b = get_magnitude(b, dim);
+  float a_b = dot_product(a, b, dim);
+
+  return a_b / (magnitude_a * magnitude_b);
+}

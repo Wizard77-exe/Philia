@@ -4,9 +4,9 @@
 #include <stdbool.h>
 
 #define WINDOW_SIZE   2
-#define EMBEDDING_DIM 64
+#define EMBEDDING_DIM 256
 #define LEARNING_RATE 0.01f
-#define EPOCHS        1000
+#define EPOCHS        2000
 
 // from TF_IDF
 typedef struct {
@@ -35,6 +35,8 @@ typedef struct {
 
 typedef struct {
     DocumentTerm *terms;
+
+    float *embeddings;        // average embedding of Document.
 
     float magnitude;
 
@@ -133,6 +135,11 @@ typedef struct {
 
   bool success;
 } BackwardPass;
+
+typedef struct {
+  int id;
+  float similarity;
+} Neighbor;
 
 // Query Representation
 typedef struct Query {

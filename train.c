@@ -116,10 +116,10 @@ int main() {
            epoch + 1,
            epoch_loss);
 
-    if (fabs(previous_loss - epoch_loss) < 1e-6f) {
+    /*if (fabs(previous_loss - epoch_loss) < 1e-6f) {
       printf("\nTrainer-san: Converged at epoch %d!\n", epoch + 1);
       break;
-    }
+    }*/
 
     previous_loss = epoch_loss;
 
@@ -135,7 +135,7 @@ int main() {
     return 1;
   }
 
-  SkipGram v = create_skipgram(t.vocabulary.count, EMBEDDING_DIM);
+  /*SkipGram v = create_skipgram(t.vocabulary.count, EMBEDDING_DIM);
   if (!load_embeddings("models/embedding.bin", &v)) {
     fclose(loss_file);
     free_skipgram(&model);
@@ -150,12 +150,12 @@ int main() {
     for (int j = 0; j < v.embedding_dim; j++) {
       printf("INPUT: %20s OUTPUT: %20s\n", model.input.vectors[i].values[j] == v.input.vectors[i].values[j]? "true":"false", model.output.vectors[i].values[j] == v.output.vectors[i].values[j]?"true":"false");
     }
-  }
+  }*/
 
   // NOTE: freeing area;
   //free_forwardpass(&fp);
   fclose(loss_file);
-  free_skipgram(&v);
+  //free_skipgram(&v);
   free_skipgram(&model);
   free_embedding_matrix(&matrix);
   free_corpus(&t);
