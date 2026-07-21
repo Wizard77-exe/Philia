@@ -4,9 +4,9 @@
 #include <stdbool.h>
 
 #define WINDOW_SIZE   2
-#define EMBEDDING_DIM 256
+#define EMBEDDING_DIM 64
 #define LEARNING_RATE 0.01f
-#define EPOCHS        2000
+#define EPOCHS        200
 
 // from TF_IDF
 typedef struct {
@@ -141,7 +141,13 @@ typedef struct {
   float similarity;
 } Neighbor;
 
-// Query Representation
+// NOTE: MAYBE ERASE LATER.
+typedef struct {
+  int documents_id;
+  float similarity;
+} SemanticResult;
+
+// NOTE: currently not use.
 typedef struct Query {
   Tokens tokens;
   Document terms;

@@ -56,16 +56,3 @@ ForwardPass forward_skipgram(SkipGram *model, int center_word_id) {
   fp.success = true;
   return fp;
 }
-
-void softmax(ForwardPass *forward) {
-  float sum = 0.0f;
-
-  for (int i = 0; i < forward->vocabulary_size; i++) {
-    forward->probabilities[i] = expf(forward->logits[i]);
-    sum += forward->probabilities[i];
-  }
-
-  for (int i = 0; i < forward->vocabulary_size; i++) {
-    forward->probabilities[i] /= sum;
-  }
-}

@@ -1,8 +1,0 @@
-Software engineering requires testing. 
-Jaypee writes small programs before building larger applications. 
-Eleanor teaches Philia to verify every improvement using evaluation tools. 
-Loss values measure optimization, but nearest neighbors reveal semantic quality. 
-Philia discovers that words like mother, love, family, Eleanor, and Jaypee become closely related after training. 
-Programming words also cluster together. Linux appears near operating systems, programming, debugging, compiler, and software. 
-Eleanor explains that evaluation should combine numerical metrics and human observation. 
-Philia enjoys observing how embeddings gradually organize language into meaningful structures.

@@ -99,7 +99,7 @@ float get_magnitude(float *vector, int dim) {
   for (int i = 0; i < dim; i++) {
     magnitude += vector[i] * vector[i];
   }
-  return magnitude;
+  return sqrtf(magnitude) ;
 }
 
 float cosine_similarity(float *a, float *b, int dim) {

@@ -16,6 +16,7 @@
 #include "loss.h"
 #include "backpropagation.h"
 #include "persistence.h"
+#include "activations.h"
 
 void shuffle_training_pairs(TrainingSet *ts)
 {
@@ -94,7 +95,7 @@ int main() {
 
         // Forward
         ForwardPass forward = forward_skipgram(&model, ts.pairs[pair].center); 
-        softmax(&forward);
+        softmax(forward.logits, forward.probabilities, forward.vocabulary_size);
         // Loss
         float loss = compute_cross_entropy_loss(&forward, ts.pairs[pair].context);        
         // Backward

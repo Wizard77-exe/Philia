@@ -20,7 +20,6 @@ Document compute_tf(Tokens tokens) {
   Document dt = {0};
 
   dt.terms = calloc(tokens.count, sizeof(DocumentTerm));
-  dt.embeddings = calloc(EMBEDDING_DIM, sizeof(float));
 
   if (dt.terms == NULL) {
     // ;
@@ -28,6 +27,8 @@ Document compute_tf(Tokens tokens) {
     free(dt.embeddings);
     return dt;
   }
+
+  dt.embeddings = calloc(EMBEDDING_DIM, sizeof(float));
 
   if (dt.embeddings == NULL) {
     printf("ERROR: Memory allocation on Documents.embeddings inside the compute_tf() function.\n");
