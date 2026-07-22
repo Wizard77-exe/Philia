@@ -17,4 +17,8 @@ float dot_product(float *a, float *b, int dim);
 float get_magnitude(float *vector, int dim);
 float cosine_similarity(float *a, float *b, int dim);
 
+void normalize_embedding_matrix(SkipGram *model);
+void normalize_query_embedding(float *embeddings, int dim);
+void normalize_corpus_embeddings(Corpus *corpus, int dim);
+
 #endif

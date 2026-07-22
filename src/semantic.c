@@ -91,6 +91,8 @@ SemanticResult *semantic_search(SkipGram *model, Corpus *corpus, char *query, in
   sentence_embedding(model, &query_tokens, query_embeddings);
   // check query_embeddings.
   
+  normalize_query_embedding(query_embeddings, EMBEDDING_DIM);
+
   SemanticResult *results = rank_documents_semantics(corpus, query_embeddings, EMBEDDING_DIM);
   // check results.
   if (results == NULL) {

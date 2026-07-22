@@ -126,6 +126,13 @@ int main() {
 
   }
 
+  normalize_embedding_matrix(&model);
+
+  /*for (int i = 0; i < model.vocabulary_size; i++) {
+    normalize_vector(model.input.vectors[i].values, model.embedding_dim);
+    normalize_vector(model.output.vectors[i].values, model.embedding_dim);
+  }
+
   if (!save_embeddings("models/embedding.bin", &model)) {
     printf("Error on saving embeddings\n");
     fclose(loss_file);

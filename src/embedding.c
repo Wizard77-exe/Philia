@@ -103,9 +103,33 @@ float get_magnitude(float *vector, int dim) {
 }
 
 float cosine_similarity(float *a, float *b, int dim) {
-  float magnitude_a = get_magnitude(a, dim);
-  float magnitude_b = get_magnitude(b, dim);
-  float a_b = dot_product(a, b, dim);
+  return dot_product(a, b, dim);
+}
 
-  return a_b / (magnitude_a * magnitude_b);
+static void normalize_vector(float *vector, int dim) {
+  float magnitude = get_magnitude(vector, dim);
+
+  if (magnitude < 1e-8f)
+    return;
+
+  for (int i = 0; i < dim; i++) {
+    vector[i] /= magnitude;
+  }
+}
+
+void normalize_embedding_matrix(SkipGram *model) {
+  for (int i = 0; i < model->vocabulary_size; i++) {
+    normalize_vector(model->input.vectors[i].values, model->embedding_dim);
+    normalize_vector(model->output.vectors[i].values, model->embedding_dim);
+  }
+}
+
+void normalize_query_embedding(float *embeddings, int dim) {
+  normalize_vector(embeddings, dim);
+}
+
+void normalize_corpus_embeddings(Corpus *corpus, int dim) {
+  for (int i = 0; i < corpus->documents_count; i++) {
+    normalize_vector(corpus->documents[i].embeddings, dim);
+  }
 }

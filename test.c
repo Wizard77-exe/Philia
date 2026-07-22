@@ -35,6 +35,13 @@ int main() {
     return 1;
   }
 
+  for (int i = 0; i < model.vocabulary_size; i++) {
+    for (int j = 0; j < model.embedding_dim; j++) {
+      printf("%-10f ", model.input.vectors[i].values[j]);
+    }
+    printf("\n");
+  }
+
   /*for (int i = 0; i < model.vocabulary_size; i++) {
     for (int j = 0; j < model.embedding_dim; j++) {
       printf("Input: %-10.6fOutput: %-10.6f\n", model.input.vectors[i].values[j], model.output.vectors[i].values[j]);
@@ -42,6 +49,7 @@ int main() {
   }*/
 
   build_document_embeddings(&model, &corpus);
+  normalize_documents_embeddings(&corpus, EMBEDDING_DIM);
 
   /*for (int i = 0; i < corpus.documents_count; i++) {
     printf("Document %d\n", i);
@@ -53,7 +61,7 @@ int main() {
     }
   }*/
 
-  printf("Enter sentence: ");
+  /*printf("Enter sentence: ");
   char sentence[128];
   fgets(sentence, sizeof(sentence), stdin);
   sentence[strcspn(sentence, "\n")] = '\0';

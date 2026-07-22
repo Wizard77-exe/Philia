@@ -49,6 +49,15 @@ int main() {
 
   // NOTE: computes and assign average embedding vectors of each corpus' documents.
   build_document_embeddings(&model, &corpus);
+  normalize_corpus_embeddings(&corpus, EMBEDDING_DIM);
+
+  // TEST:
+  int index = vocabulary_index(corpus.vocabulary, "philia");
+  float philia_magnitude = get_magnitude(model.input.vectors[index].values, EMBEDDING_DIM);
+  printf("Philia's Magnitude: %f\n", philia_magnitude);
+
+  float document_zero = get_magnitude(corpus.documents[0].embeddings, EMBEDDING_DIM);
+  printf("Document 0 Magnitude: %f\n", document_zero);
 
   // NOTE: THIS MIGHT BE CHANGED LATER: This only asks for the user's prompt.
   char prompt[4096];
