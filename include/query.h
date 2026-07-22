@@ -3,6 +3,6 @@
 
 #include "structures.h"
 
-Query build_query(const char *input, Vocabulary v);
+Query build_query(Corpus *corpus, SkipGram *model, char *query);
 
 #endif

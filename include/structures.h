@@ -147,10 +147,21 @@ typedef struct {
   float similarity;
 } SemanticResult;
 
-// NOTE: currently not use.
+// NOTE: HYBRID SEARCH.
+typedef struct {
+  int document_id;
+
+  float semantic_score;
+  float tfidf_score;
+  float hybrid_score;
+} HybridResult;
+
 typedef struct Query {
   Tokens tokens;
-  Document terms;
+  Document document;
+  float *embeddings;
+
+  bool success;
 } Query;
 
 #endif

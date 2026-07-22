@@ -132,3 +132,11 @@ void free_backwardpass(BackwardPass *backward) {
   backward->vocabulary_size = 0;
   backward->success = false;
 }
+
+// NOTE: for freeing Query
+void free_query(Query *query) {
+  free_tokens(&query->tokens);
+  free_document(&query->document);
+  free(query->embeddings);
+  query->embeddings = NULL;
+}

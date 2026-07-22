@@ -38,8 +38,8 @@ int main() {
   t.vocabulary = build_vocabulary(t.documents, t.documents_count);
 
   compute_idf(&t.vocabulary, t.documents_count);
-  apply_idf(t.documents, t.documents_count, t.vocabulary);
-  compute_tfidf(t.documents, t.documents_count);
+  apply_corpus_idf(t.documents, t.documents_count, t.vocabulary);
+  compute_corpus_tfidf(t.documents, t.documents_count);
   document_magnitude(t.documents, t.documents_count);
 
   copy_id_to_documents(t.documents, t.documents_count, t.vocabulary);

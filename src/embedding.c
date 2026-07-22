@@ -124,7 +124,7 @@ void normalize_embedding_matrix(SkipGram *model) {
   }
 }
 
-void normalize_query_embedding(float *embeddings, int dim) {
+void normalize_query_embeddings(float *embeddings, int dim) {
   normalize_vector(embeddings, dim);
 }
 

@@ -3,7 +3,7 @@
 
 #include "structures.h"
 
-//void sentence_embedding(SkipGram *model, Tokens *tokens, float *output);
+void sentence_embedding(SkipGram *model, Tokens *tokens, float *output);
 void build_document_embeddings(SkipGram *model, Corpus *corpus);
 
 //SemanticResult *rank_documents_semantics(Corpus *corpus, float *output, int dim);

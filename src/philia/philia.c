@@ -12,6 +12,8 @@
 #include "semantic.h"
 #include "persistence.h"
 #include "skipgram.h"
+#include "query.h"
+#include "hybridsearch.h"
 
 #define TOP_K 3
 
@@ -30,12 +32,20 @@ int main() {
 
   // NOTE: COMPUTING AND ASSIGNING TF-IDF AND IDs TO DOCUMENTS AND VOCABULARY.
   compute_idf(&corpus.vocabulary, corpus.documents_count);
-  apply_idf(corpus.documents, corpus.documents_count, corpus.vocabulary);
-  compute_tfidf(corpus.documents, corpus.documents_count);
+  apply_corpus_idf(corpus.documents, corpus.documents_count, corpus.vocabulary);
+  compute_corpus_tfidf(corpus.documents, corpus.documents_count);
   document_magnitude(corpus.documents, corpus.documents_count);
-
+  
   copy_id_to_documents(corpus.documents, corpus.documents_count, corpus.vocabulary);
   copy_id_to_tokens(corpus.tokens, corpus.documents_count, corpus.vocabulary);
+
+  // TEST: 
+  for (int i = 0; i < corpus.documents_count; i++) {
+    printf("Document #%d: Magnitude: %f\n", i + 1, corpus.documents[i].magnitude);
+    for (int j = 0; j < corpus.documents[i].count; j++) {
+      printf("Term: %-15s ID: %-4d TF: %.6f IDF: %.6f TF-IDF: %-4.5f\n", corpus.documents[i].terms[j].word, corpus.documents[i].terms[j].id, corpus.documents[i].terms[j].tf, corpus.documents[i].terms[j].idf, corpus.documents[i].terms[j].tf_idf);
+    }
+  }
 
   // NOTE: CREATING AND LOADING TRAINED MODEL TO SKIPGRAM.
   SkipGram model = create_skipgram(corpus.vocabulary.count, EMBEDDING_DIM);
@@ -51,14 +61,6 @@ int main() {
   build_document_embeddings(&model, &corpus);
   normalize_corpus_embeddings(&corpus, EMBEDDING_DIM);
 
-  // TEST:
-  int index = vocabulary_index(corpus.vocabulary, "philia");
-  float philia_magnitude = get_magnitude(model.input.vectors[index].values, EMBEDDING_DIM);
-  printf("Philia's Magnitude: %f\n", philia_magnitude);
-
-  float document_zero = get_magnitude(corpus.documents[0].embeddings, EMBEDDING_DIM);
-  printf("Document 0 Magnitude: %f\n", document_zero);
-
   // NOTE: THIS MIGHT BE CHANGED LATER: This only asks for the user's prompt.
   char prompt[4096];
 
@@ -66,22 +68,29 @@ int main() {
   fgets(prompt, sizeof(prompt), stdin);
   prompt[strcspn(prompt, "\n")] = '\0';         // REMOVES THE NEWLINE CHARACTER FROM FGETS AND CHANGES IT TO '\0'.
   
-  SemanticResult *top_k_documents = semantic_search(&model, &corpus, prompt, TOP_K);
-  if (top_k_documents == NULL) {
-    printf("%sPHILIA:%s Dad? I think I failed on semantic_search() function.\n", BRIGHT_GREEN, RESET);
+  // TEST: 
+  Query query = build_query(&corpus, &model, prompt);
+  if (!query.success) {
     free_corpus(&corpus);
     free_skipgram(&model);
     return 1;
   }
 
-  // NOTE: TEST RUN.
-  printf("Top Retrieved Documents (TOP %d):\n", TOP_K);
-  for (int i = 0; i < TOP_K; i++) {
-    printf("%d. Document #%-3d Similarity: %f\n", i+1, top_k_documents[i].documents_id, top_k_documents[i].similarity);
+  // TEST: 
+  printf("Sentence magnitude: %f\n", query.document.magnitude);
+  for (int i = 0; i < query.document.count; i++) {
+    printf("Term: %-15s ID: %-3d TF: %.6f IDF: %.6f TF-IDF: %-5.6f\n", query.document.terms[i].word, query.document.terms[i].id, query.document.terms[i].tf, query.document.terms[i].idf, query.document.terms[i].tf_idf);
+  }
+
+  HybridResult *hybridresult = hybrid_search(&query, &corpus, &model, 0.5);
+
+  for (int i = 0; i < corpus.documents_count; i++) {
+    printf("Document ID: %-3d  Semantic Score: %-10f TF-IDF Score: %-10f  Hybrid Score: %-10f\n", hybridresult[i].document_id, hybridresult[i].semantic_score, hybridresult[i].tfidf_score, hybridresult[i].hybrid_score);
   }
 
   // NOTE: Don't forget to free everything you've borrowed from the memory.
   free_corpus(&corpus);
   free_skipgram(&model);
-  free(top_k_documents);
+  free_query(&query);
+  free(hybridresult);
 }

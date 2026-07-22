@@ -68,6 +68,6 @@ Vocabulary build_vocabulary(Document *documents, int count) {
 
 void compute_idf(Vocabulary *v, int N) {
   for (int i = 0; i < v->count; i++) {
-    v->terms[i].idf = (float)(log((float)N/ (float)v->terms[i].df));
+    v->terms[i].idf = (float)(log((float)(N + 1)/ (float)(v->terms[i].df + 1)) + 1);
   }
 }

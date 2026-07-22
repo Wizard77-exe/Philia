@@ -59,7 +59,7 @@ void copy_id_to_documents(Document *docs, int count, Vocabulary v) {
       int idx = vocabulary_index(v, docs[i].terms[j].word);
 
       if (idx == -1) {
-        docs[i].terms[j].id = 0;
+        docs[i].terms[j].id = -1;
         continue;
       }
 

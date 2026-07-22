@@ -36,4 +36,7 @@ void free_expected_distribution(ExpectedDistribution *expected);
 // NOTE: For freeing the BackwardPass
 void free_backwardpass(BackwardPass *backward);
 
+// NOTE: For freeing Query.
+void free_query(Query *query);
+
 #endif

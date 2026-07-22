@@ -8,7 +8,7 @@
 #include "setfree.h"
 #include "corpus.h"
 
-static void sentence_embedding(SkipGram *model, Tokens *tokens, float *output) {
+void sentence_embedding(SkipGram *model, Tokens *tokens, float *output) {
   if (tokens->count == 0) {
     memset(output, 0, sizeof(float) * model->embedding_dim);
     return;
@@ -91,7 +91,7 @@ SemanticResult *semantic_search(SkipGram *model, Corpus *corpus, char *query, in
   sentence_embedding(model, &query_tokens, query_embeddings);
   // check query_embeddings.
   
-  normalize_query_embedding(query_embeddings, EMBEDDING_DIM);
+  normalize_query_embeddings(query_embeddings, EMBEDDING_DIM);
 
   SemanticResult *results = rank_documents_semantics(corpus, query_embeddings, EMBEDDING_DIM);
   // check results.
