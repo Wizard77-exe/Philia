@@ -6,6 +6,7 @@
 
 #include "structures.h"
 #include "setfree.h"
+#include "embedding.h"
 
 ExpectedDistribution create_expected_distribution(int vocabulary_size, int target_word_id) {
   ExpectedDistribution expected = {0};
@@ -24,7 +25,60 @@ ExpectedDistribution create_expected_distribution(int vocabulary_size, int targe
   return expected;
 }
 
-BackwardPass backward_skipgram(ForwardPass *forward, ExpectedDistribution *expected) {
+static float *compute_d_logits(ForwardPass *forward, ExpectedDistribution *expected) {
+  float *d_logits = calloc(forward->vocabulary_size, sizeof(float));
+  // check.
+  for (int i = 0; i < forward->vocabulary_size; i++) {
+    d_logits[i] = forward->probabilities[i] - expected->expected[i];
+  }
+
+  return d_logits;
+}
+
+static float *compute_d_hidden(SkipGram *model, float *d_logits) {
+  float *d_hidden = calloc(model->embedding_dim, sizeof(float));
+  // check;
+
+  for (int dim = 0; dim < model->embedding_dim; dim++) {
+    d_hidden[dim] = 0.0f;
+
+    for (int word = 0; word < model->vocabulary_size; word++) {
+      d_hidden[dim] += model->output.vectors[word].values[dim] * d_logits[word];
+    }
+  }
+
+  return d_hidden;
+}
+
+static EmbeddingMatrix compute_output_gradients(SkipGram *model, float *d_logits, int center) {
+  EmbeddingMatrix output_gradients = create_embedding_matrix(model->vocabulary_size, model->embedding_dim);
+  // check;
+
+  for (int word = 0; word < model->vocabulary_size; word++) {
+    for (int dim = 0; dim < model->embedding_dim; dim++) {
+      output_gradients.vectors[word].values[dim] = d_logits[word] * model->input.vectors[center].values[dim];
+    }
+  }
+
+  return output_gradients;
+}
+
+BackwardPass backward_skipgram(SkipGram *model, ForwardPass *forward, ExpectedDistribution *expected, int center) {
+  BackwardPass backward = {0};
+
+  backward.d_logits = compute_d_logits(forward, expected);
+  // check.
+  backward.d_hidden = compute_d_hidden(model, backward.d_logits);
+  // check.
+  backward.output_gradients = compute_output_gradients(model, backward.d_logits, center);
+  // check.
+
+  backward.success = true;
+
+  return backward;
+}
+
+/*BackwardPass backward_skipgram(ForwardPass *forward, ExpectedDistribution *expected) {
   BackwardPass backward = {0};
 
   backward.vocabulary_size = forward->vocabulary_size;
@@ -42,9 +96,9 @@ BackwardPass backward_skipgram(ForwardPass *forward, ExpectedDistribution *expec
   backward.success = true;
 
   return backward;
-}
+}*/
 
-void gradient_descent(SkipGram *model, BackwardPass *backward, int center_word_id, float learning_rate) {
+/*void gradient_descent(SkipGram *model, BackwardPass *backward, int center_word_id, float learning_rate) {
   // NOTE: update the output vector of the output matrix.
   for (int i = 0; i < model->vocabulary_size; i++) {
     for (int j = 0; j < model->embedding_dim; j++) {
@@ -61,4 +115,4 @@ void gradient_descent(SkipGram *model, BackwardPass *backward, int center_word_i
 
     model->input.vectors[center_word_id].values[i] -= learning_rate * accumulator;
   }
-}
+}*/

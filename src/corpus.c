@@ -8,12 +8,55 @@
 #include "documents.h"
 #include "tokens.h"
 #include "vocabulary.h"
+#include "embedding.h"
 
 static int only_txt(const struct dirent *entry) {
   if (strstr(entry->d_name, ".txt"))
     return 1;
 
   return 0;
+}
+
+void compute_corpus_tfidf(Document *docs, int count, Vocabulary *vocabulary) {
+  for (int i = 0; i < count; i++) {
+    docs[i].tf_idf_values = document_tfidf(&docs[i], vocabulary);
+  }
+}
+
+void corpus_document_tf_idf_magnitude(Document *docs, int count, int dim) {
+  for (int i = 0; i < count; i++) {
+    docs[i].tf_idf_magnitude = get_magnitude(docs[i].tf_idf_values, dim);
+  }
+}
+
+void copy_id_to_tokens(Tokens *tokens, int count, Vocabulary v) {
+  for (int i = 0; i < count; i++) {
+    for (int j = 0; j < tokens[i].count; j++) {
+      int idx = vocabulary_index(v, tokens[i].tokens[j].word);
+
+      if (idx == -1) {
+        tokens[i].tokens[j].id = -1;
+        continue;
+      }
+
+      tokens[i].tokens[j].id = v.terms[idx].id;
+    }
+  }
+}
+
+void copy_id_to_documents(Document *docs, int count, Vocabulary v) {
+  for (int i = 0; i < count; i++) {
+    for (int j = 0; j < docs[i].count; j++) {
+      int idx = vocabulary_index(v, docs[i].terms[j].word);
+
+      if (idx == -1) {
+        docs[i].terms[j].id = -1;
+        continue;
+      }
+
+      docs[i].terms[j].id = v.terms[idx].id;
+    }
+  }
 }
 
 Corpus build_corpus(void) {
@@ -50,35 +93,14 @@ Corpus build_corpus(void) {
   }
   free(namelist);
 
+  corpus.vocabulary = build_vocabulary(corpus.documents, corpus.documents_count);
+
+  copy_id_to_documents(corpus.documents, corpus.documents_count, corpus.vocabulary);
+  copy_id_to_tokens(corpus.tokens, corpus.documents_count, corpus.vocabulary);
+
+  compute_idf(&corpus.vocabulary, corpus.documents_count);
+  compute_corpus_tfidf(corpus.documents, corpus.documents_count, &corpus.vocabulary);
+
+  corpus_document_tf_idf_magnitude(corpus.documents, corpus.documents_count, corpus.vocabulary.count);
   return corpus;
-}
-
-void copy_id_to_documents(Document *docs, int count, Vocabulary v) {
-  for (int i = 0; i < count; i++) {
-    for (int j = 0; j < docs[i].count; j++) {
-      int idx = vocabulary_index(v, docs[i].terms[j].word);
-
-      if (idx == -1) {
-        docs[i].terms[j].id = -1;
-        continue;
-      }
-
-      docs[i].terms[j].id = v.terms[idx].id;
-    }
-  }
-}
-
-void copy_id_to_tokens(Tokens *tokens, int count, Vocabulary v) {
-  for (int i = 0; i < count; i++) {
-    for (int j = 0; j < tokens[i].count; j++) {
-      int idx = vocabulary_index(v, tokens[i].tokens[j].word);
-
-      if (idx == -1) {
-        tokens[i].tokens[j].id = -1;
-        continue;
-      }
-
-      tokens[i].tokens[j].id = v.terms[idx].id;
-    }
-  }
 }

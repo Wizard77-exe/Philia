@@ -54,3 +54,15 @@ TrainingSet build_training_set(Corpus c, int window_size) {
   t.success = true;
   return t;
 }
+
+void shuffle_training_pairs(TrainingSet *ts)
+{
+  for (int i = ts->count - 1; i > 0; i--) {
+
+    int j = rand() % (i + 1);
+
+    TrainingPair temp = ts->pairs[i];
+    ts->pairs[i] = ts->pairs[j];
+    ts->pairs[j] = temp;
+  }
+}

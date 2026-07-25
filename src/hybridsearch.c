@@ -17,7 +17,7 @@ HybridResult *hybrid_search(Query *query, Corpus *corpus, SkipGram *model, float
   for (int i = 0; i < corpus->documents_count; i++) {
     result[i].document_id = i;
     result[i].semantic_score = cosine_similarity(corpus->documents[i].embeddings, query->embeddings, model->embedding_dim);
-    result[i].tfidf_score = (float)document_cosine_similarity(query->document, corpus->documents[i]);
+    result[i].tfidf_score = cosine_similarity(query->document.tf_idf_values, corpus->documents[i].tf_idf_values, corpus->vocabulary.count);
     result[i].hybrid_score = (alpha * result[i].semantic_score) + ((1 - alpha) * result[i].tfidf_score);
 
     for (int j = 0; j < i; j++) {

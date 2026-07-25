@@ -36,9 +36,9 @@ Query build_query(Corpus *corpus, SkipGram *model, char *prompt) {
 
   copy_id_to_documents(&query.document, 1, corpus->vocabulary);
 
-  apply_idf(&query.document, corpus->vocabulary);
-  compute_tfidf(&query.document);
-  document_magnitude(&query.document, 1);
+  //apply_idf(&query.document, corpus->vocabulary);
+  document_tfidf(&query.document, &corpus->vocabulary);
+  get_magnitude(query.document.tf_idf_values, query.document.count);
 
   query.embeddings = calloc(model->embedding_dim, sizeof(float));
 

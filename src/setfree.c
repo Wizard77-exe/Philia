@@ -39,10 +39,12 @@ void free_document(Document *d) {
 
   free(d->terms);
   free(d->embeddings);
+  free(d->tf_idf_values);
   d->terms = NULL;
   d->count = 0;
   d->capacity = 0;
-  d->magnitude = 0.0f;
+  d->embedding_magnitude = 0.0f;
+  d->tf_idf_magnitude = 0.0f;
   d->success = false;
 }
 
@@ -126,10 +128,9 @@ void free_expected_distribution(ExpectedDistribution *expected) {
 
 // NOTE: for freeing BackwardPass
 void free_backwardpass(BackwardPass *backward) {
-  free(backward->gradients);
-
-  backward->gradients = NULL;
-  backward->vocabulary_size = 0;
+  free(backward->d_logits);
+  free(backward->d_hidden);
+  free_embedding_matrix(&backward->output_gradients);
   backward->success = false;
 }
 

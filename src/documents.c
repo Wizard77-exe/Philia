@@ -3,9 +3,10 @@
 #include <string.h>
 #include <math.h>
 
-#include "structures.h"
+#include "documents.h"
 #include "setfree.h"
 #include "vocabulary.h"
+#include "embedding.h"
 
 static int is_in_documentTerms(Document dt, const char *word) {
   for (int i = 0; i < dt.count; i++) {
@@ -28,19 +29,20 @@ Document compute_tf(Tokens tokens) {
     return dt;
   }
 
-  dt.embeddings = calloc(EMBEDDING_DIM, sizeof(float));
+  // NOTE: I'll do this to avoid allocating embeddings for documents during training to avoid allocating and not using.
+  /*dt.embeddings = calloc(EMBEDDING_DIM, sizeof(float));
 
   if (dt.embeddings == NULL) {
     printf("ERROR: Memory allocation on Documents.embeddings inside the compute_tf() function.\n");
     free(dt.terms);
     return dt;
-  }
+  }*/
 
   for (int i = 0; i < tokens.count; i++) {
     int index = is_in_documentTerms(dt, tokens.tokens[i].word);
     if (index >= 0) {
       (dt.terms[index].frequency) += 1;
-      dt.terms[index].tf = (float)((float)dt.terms[index].frequency / (float)tokens.count);
+      dt.terms[index].tf = (float)dt.terms[index].frequency / (float)tokens.count;
       continue;
     }
 
@@ -52,7 +54,7 @@ Document compute_tf(Tokens tokens) {
     }
 
     dt.terms[dt.count].frequency = 1;
-    dt.terms[dt.count].tf = (float)((float)dt.terms[dt.count].frequency / (float)tokens.count);
+    dt.terms[dt.count].tf = (float)dt.terms[dt.count].frequency / (float)tokens.count;
     dt.count++;
   }
 
@@ -60,7 +62,7 @@ Document compute_tf(Tokens tokens) {
   return dt;
 }
 
-void apply_idf(Document *doc, Vocabulary v) {
+/*void apply_idf(Document *doc, Vocabulary v) {
   for (int i = 0; i < doc->count; i++) {
     int idx = vocabulary_index(v, doc->terms[i].word);
 
@@ -71,53 +73,55 @@ void apply_idf(Document *doc, Vocabulary v) {
 
     doc->terms[i].idf = v.terms[idx].idf;
   }
-}
+}*/
 
-void apply_corpus_idf(Document *docs, int count, Vocabulary v) {
+/*void apply_corpus_idf(Document *docs, int count, Vocabulary v) {
   for (int i = 0; i < count; i++) {
     apply_idf(&docs[i], v);
   }
-}
+}*/
 
-void compute_tfidf(Document *doc) {
+/*void compute_tfidf(Document *doc) {
   for (int i = 0; i < doc->count; i++) {
-    doc->terms[i].tf_idf = (float)doc->terms[i].tf * (float)doc->terms[i].idf;
+    doc->tf_idf_values[i] = (float)doc->terms[i].tf * (float)doc->terms[i].idf;
   }
-}
+}*/
 
-void compute_corpus_tfidf(Document *docs, int count) {
-  for (int i = 0; i < count; i++) {
-    compute_tfidf(&docs[i]);
-  }
-}
-
-void document_magnitude(Document *docs, int count) {
-  for (int i = 0; i < count; i++) {
-    float sum_squared_components = 0.0f;
-    for (int j = 0; j < docs[i].count; j++) {
-      sum_squared_components += (float)((float)docs[i].terms[j].tf_idf * (float)docs[i].terms[j].tf_idf);
-    }
-    docs[i].magnitude = sqrtf(sum_squared_components);
-  }
-}
-
-double document_dot_product(Document *a, Document *b) {
-  double dot_product = 0.0;
+/*float document_dot_product(Document *a, Document *b) {
+  float dot_product = 0.0f;
 
   for (int i = 0; i < a->count; i++) {
     for (int j = 0; j < b->count; j++) {
       if (strcmp(a->terms[i].word, b->terms[j].word) == 0) {
-        dot_product += a->terms[i].tf_idf * b->terms[j].tf_idf;
+        dot_product += a->tf_idf_values[i] * b->tf_idf_values[j];
         break;
       }
     }
   }
+
   return dot_product;
-}
+}*/
 
-double document_cosine_similarity(Document a, Document b) {
-  double dot_product = document_dot_product(&a, &b);
-  double cos_sim = dot_product / (a.magnitude * b.magnitude);
+// this function assumes that the tf-idf vectors of both documents are already normalized.
+/*float document_cosine_similarity(Document a, Document b) {
+  return document_dot_product(&a, &b);
+}*/
 
-  return cos_sim;
+// computes the tf_idf of a document.
+float *document_tfidf(Document *document, Vocabulary *vocabulary) {
+  float *tf_idf = calloc(vocabulary->count, sizeof(float));
+
+  if (tf_idf == NULL)
+    return NULL;
+
+  for (int i = 0; i < document->count; i++) {
+    int idx = vocabulary_index(*vocabulary, document->terms[i].word);
+
+    if (idx == -1)
+      continue;
+
+    tf_idf[idx] = vocabulary->terms[idx].idf * document->terms[i].tf;
+  }
+
+  return tf_idf;
 }

@@ -32,6 +32,13 @@ void sentence_embedding(SkipGram *model, Tokens *tokens, float *output) {
 
 void build_document_embeddings(SkipGram *model, Corpus *corpus) {
   for (int i = 0; i < corpus->documents_count; i++) {
+    corpus->documents[i].embeddings = calloc(model->embedding_dim, sizeof(float));
+    if (corpus->documents[i].embeddings == NULL) {
+      for (int j = 0; j < i; j++) {
+        free(corpus->documents[j].embeddings);
+      }
+      return;
+    }
     sentence_embedding(model, &corpus->tokens[i], corpus->documents[i].embeddings);
   }
 }

@@ -106,7 +106,7 @@ float cosine_similarity(float *a, float *b, int dim) {
   return dot_product(a, b, dim);
 }
 
-static void normalize_vector(float *vector, int dim) {
+void normalize_vector(float *vector, int dim) {
   float magnitude = get_magnitude(vector, dim);
 
   if (magnitude < 1e-8f)
@@ -131,5 +131,6 @@ void normalize_query_embeddings(float *embeddings, int dim) {
 void normalize_corpus_embeddings(Corpus *corpus, int dim) {
   for (int i = 0; i < corpus->documents_count; i++) {
     normalize_vector(corpus->documents[i].embeddings, dim);
+    normalize_vector(corpus->documents[i].tf_idf_values, corpus->vocabulary.count);
   }
 }

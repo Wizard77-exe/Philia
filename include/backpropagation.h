@@ -4,8 +4,8 @@
 #include "structures.h"
 
 ExpectedDistribution create_expected_distribution(int vocabulary_size, int target_word_id);
-BackwardPass backward_skipgram(ForwardPass *forward, ExpectedDistribution *expected);
+BackwardPass backward_skipgram(SkipGram *model, ForwardPass *forward, ExpectedDistribution *expected, int center);
 
-void gradient_descent(SkipGram *model, BackwardPass *backward, int center_word_id, float learning_rate);
+//void gradient_descent(SkipGram *model, BackwardPass *backward, int center_word_id, float learning_rate);
 
 #endif

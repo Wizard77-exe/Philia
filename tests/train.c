@@ -85,7 +85,7 @@ int main() {
 
     float epoch_loss = 0.0f;
 
-    // shuffle pairs
+    // shuffle pair`s
     shuffle_training_pairs(&ts);
 
     if (epoch % 100 == 0)
@@ -104,8 +104,7 @@ int main() {
         // Gradient Descent
         gradient_descent(&model, &backward, ts.pairs[pair].center, lr);
         epoch_loss += loss;
-
-      free_forwardpass(&forward);
+(&forward);
       free_expected_distribution(&expected);
       free_backwardpass(&backward);
     }

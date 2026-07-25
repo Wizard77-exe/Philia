@@ -6,7 +6,10 @@
 #define WINDOW_SIZE   2
 #define EMBEDDING_DIM 64
 #define LEARNING_RATE 0.01f
-#define EPOCHS        200
+#define EPSILON       1e-8f
+#define BETA1         0.9f
+#define BETA2         0.999f
+#define EPOCHS        2000
 
 // from TF_IDF
 typedef struct {
@@ -29,16 +32,16 @@ typedef struct {
     int id;
 
     float tf;
-    float idf;
-    float tf_idf;
 } DocumentTerm;
 
 typedef struct {
     DocumentTerm *terms;
 
+    float *tf_idf_values;     // array to store tf_idf vector.
     float *embeddings;        // average embedding of Document.
 
-    float magnitude;
+    float embedding_magnitude;  // magnitude of the embedding vector.
+    float tf_idf_magnitude;     // magnitude of the tf_idf vector.
 
     int count;
     int capacity;
@@ -129,11 +132,13 @@ typedef struct {
 } ExpectedDistribution;
 
 typedef struct {
-  float *gradients;
+    float *d_logits;
 
-  int vocabulary_size;
+    float *d_hidden;
 
-  bool success;
+    EmbeddingMatrix output_gradients;
+
+    bool success;
 } BackwardPass;
 
 typedef struct {
@@ -155,6 +160,26 @@ typedef struct {
   float tfidf_score;
   float hybrid_score;
 } HybridResult;
+
+// NOTE: OPTIMIZERS
+typedef struct {
+  EmbeddingMatrix input_direction;
+  EmbeddingMatrix input_magnitude;
+
+  EmbeddingMatrix output_direction;
+  EmbeddingMatrix output_magnitude;
+
+  int timestep;
+
+  float beta1;
+  float beta2;
+
+  float epsilon;
+
+  float learning_rate;
+
+  bool success;
+} AdamState;
 
 typedef struct Query {
   Tokens tokens;
