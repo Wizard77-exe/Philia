@@ -20,8 +20,10 @@ static int is_in_documentTerms(Document dt, const char *word) {
 Document compute_tf(Tokens tokens) {
   Document dt = {0};
 
-  dt.terms = calloc(tokens.count, sizeof(DocumentTerm));
+  dt.capacity = tokens.count;
 
+  dt.terms = calloc(dt.capacity, sizeof(DocumentTerm));
+  
   if (dt.terms == NULL) {
     // ;
     printf("ERROR: Memory allocation on Document.terms inside the compute_tf() function.\n");

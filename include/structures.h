@@ -10,6 +10,7 @@
 #define BETA1         0.9f
 #define BETA2         0.999f
 #define EPOCHS        2000
+#define ALPHA         0.5f
 
 // from TF_IDF
 typedef struct {

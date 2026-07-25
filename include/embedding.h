@@ -19,7 +19,7 @@ float cosine_similarity(float *a, float *b, int dim);
 
 void normalize_vector(float *vector, int dim);
 void normalize_embedding_matrix(SkipGram *model);
-void normalize_query_embeddings(float *embeddings, int dim);
+void normalize_query_embeddings(Query *query, int embedding_dim, int vocabulary_size);
 void normalize_corpus_embeddings(Corpus *corpus, int dim);
 
 #endif

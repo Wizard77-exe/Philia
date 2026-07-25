@@ -8,17 +8,19 @@
 #include "setfree.h"
 #include "corpus.h"
 
+// NOTE: This function assumes that output is already allocated and has a size of EMBEDDING_DIM.
 void sentence_embedding(SkipGram *model, Tokens *tokens, float *output) {
   if (tokens->count == 0) {
     memset(output, 0, sizeof(float) * model->embedding_dim);
     return;
   }
-  // float should be size EMBEDDING_DIM.
+
   float inv = 1.0f / tokens->count;
 
   for (int i = 0; i < model->embedding_dim; i++) {
     float average = 0.0f;
 
+    // Averaging the embeddings of raw tokens.
     for (int j = 0; j < tokens->count; j++) {
       if (tokens->tokens[j].id == -1)
         continue;
@@ -32,13 +34,17 @@ void sentence_embedding(SkipGram *model, Tokens *tokens, float *output) {
 
 void build_document_embeddings(SkipGram *model, Corpus *corpus) {
   for (int i = 0; i < corpus->documents_count; i++) {
+
+    // Allocates memory for each of the documents embeddings.
     corpus->documents[i].embeddings = calloc(model->embedding_dim, sizeof(float));
+
     if (corpus->documents[i].embeddings == NULL) {
       for (int j = 0; j < i; j++) {
         free(corpus->documents[j].embeddings);
       }
       return;
     }
+
     sentence_embedding(model, &corpus->tokens[i], corpus->documents[i].embeddings);
   }
 }
@@ -82,7 +88,9 @@ static SemanticResult *retrieve_top_k_documents_semantics(SemanticResult *rankin
   return tops;
 }
 
-SemanticResult *semantic_search(SkipGram *model, Corpus *corpus, char *query, int top_k) {
+// NOTE: Fix later.
+
+/*SemanticResult *semantic_search(SkipGram *model, Corpus *corpus, char *query, int top_k) {
   Tokens query_tokens = tokenize(query);
   if (!query_tokens.success)
     return NULL;
@@ -98,7 +106,7 @@ SemanticResult *semantic_search(SkipGram *model, Corpus *corpus, char *query, in
   sentence_embedding(model, &query_tokens, query_embeddings);
   // check query_embeddings.
   
-  normalize_query_embeddings(query_embeddings, EMBEDDING_DIM);
+  normalize_query_embeddings(query, EMBEDDING_DIM);
 
   SemanticResult *results = rank_documents_semantics(corpus, query_embeddings, EMBEDDING_DIM);
   // check results.
@@ -115,4 +123,4 @@ SemanticResult *semantic_search(SkipGram *model, Corpus *corpus, char *query, in
   free(results);
 
   return output;
-}
+}*/

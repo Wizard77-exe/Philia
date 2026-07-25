@@ -37,8 +37,7 @@ Query build_query(Corpus *corpus, SkipGram *model, char *prompt) {
   copy_id_to_documents(&query.document, 1, corpus->vocabulary);
 
   //apply_idf(&query.document, corpus->vocabulary);
-  document_tfidf(&query.document, &corpus->vocabulary);
-  get_magnitude(query.document.tf_idf_values, query.document.count);
+  query.document.tf_idf_values = document_tfidf(&query.document, &corpus->vocabulary);
 
   query.embeddings = calloc(model->embedding_dim, sizeof(float));
 
@@ -48,9 +47,19 @@ Query build_query(Corpus *corpus, SkipGram *model, char *prompt) {
     return query;
   }
 
+  //query.document.embeddings = calloc(model->embedding_dim, sizeof(float));
+  // if (query.document.embeddings == NULL) {
+  //   printf("%sPHILIA:%s Error on allocating memory for the Query.document.embeddings inside the build_query() function.\n", BRIGHT_GREEN, RESET);
+  //   free_query(&query);
+  //   return query;
+  // }
+
   // getting the sentence embeddings
   sentence_embedding(model, &query.tokens, query.embeddings);
-  normalize_query_embeddings(query.embeddings, model->embedding_dim);
+  normalize_query_embeddings(&query, model->embedding_dim, model->vocabulary_size);
+
+  query.document.tf_idf_magnitude = get_magnitude(query.document.tf_idf_values, model->vocabulary_size);
+  //query.document.embedding_magnitude = get_magnitude(query.document.embeddings, model->embedding_dim);
 
   query.success = true;
   return query;

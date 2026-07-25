@@ -124,8 +124,9 @@ void normalize_embedding_matrix(SkipGram *model) {
   }
 }
 
-void normalize_query_embeddings(float *embeddings, int dim) {
-  normalize_vector(embeddings, dim);
+void normalize_query_embeddings(Query *query, int embedding_dim, int vocabulary_size) {
+  normalize_vector(query->embeddings, embedding_dim);
+  normalize_vector(query->document.tf_idf_values, vocabulary_size);
 }
 
 void normalize_corpus_embeddings(Corpus *corpus, int dim) {
