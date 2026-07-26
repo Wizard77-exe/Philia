@@ -50,7 +50,7 @@ ForwardPass forward_skipgram(SkipGram *model, int center_word_id) {
   }
 
   for (int i = 0; i < fp.vocabulary_size; i++) {
-    fp.logits[i] = embedding_dot_product(center_word_vector, &model->output.vectors[i], EMBEDDING_DIM);
+    fp.logits[i] = dot_product(center_word_vector->values, model->output.vectors[i].values, EMBEDDING_DIM);// embedding_dot_product(center_word_vector, &model->output.vectors[i], EMBEDDING_DIM);
   }
 
   fp.success = true;

@@ -43,36 +43,6 @@ void random_initialize_embedding(EmbeddingMatrix *matrix) {
   }
 }
 
-float embedding_dot_product(const EmbeddingVector *a, const EmbeddingVector *b, int dim) {
-  float dot_product = 0.0f;
-  for (int i = 0; i < dim; i++) {
-    dot_product += a->values[i] * b->values[i];
-  }
-
-  return dot_product;
-}
-
-float embedding_magnitude(const EmbeddingVector *v, int dim) {
-  float sum_squared_components = 0.0f;
-  for (int i = 0; i < dim; i++) {
-    sum_squared_components += v->values[i] * v->values[i];
-  }
-
-  return sqrtf(sum_squared_components);
-}
-
-float embedding_cosine_similarity(const EmbeddingVector *a, const EmbeddingVector *b, int dim) {
-  float dot_product = embedding_dot_product(a, b, dim);
-  float magnitude_a = embedding_magnitude(a, dim);
-  float magnitude_b = embedding_magnitude(b, dim);
-
-  if (magnitude_a == 0.0f || magnitude_b == 0.0f) {
-    return 0.0f;
-  }
-
-  return dot_product / (magnitude_a * magnitude_b);
-}
-
 EmbeddingVector *get_embedding(EmbeddingMatrix *matrix, int word_id) {
   if (matrix == NULL) 
     return NULL;

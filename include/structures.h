@@ -9,7 +9,7 @@
 #define EPSILON       1e-8f
 #define BETA1         0.9f
 #define BETA2         0.999f
-#define EPOCHS        2000
+#define EPOCHS        200
 #define ALPHA         0.5f
 
 // from TF_IDF
@@ -97,7 +97,7 @@ typedef struct {
 } EmbeddingVector;
 
 typedef struct {
-  EmbeddingVector *vectors;
+  EmbeddingVector *vectors;   // size of vocabulary_size. each vector has size of dimension.
 
   int vocabulary_size;
   int dimension;
