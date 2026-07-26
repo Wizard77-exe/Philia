@@ -8,5 +8,6 @@ EmbeddingMatrix matrix_add(const EmbeddingMatrix a, const EmbeddingMatrix b);
 EmbeddingMatrix matrix_subtract(const EmbeddingMatrix a, const EmbeddingMatrix b);
 EmbeddingMatrix matrix_scale(const EmbeddingMatrix a, float scalar);
 EmbeddingMatrix matrix_copy(const EmbeddingMatrix a);
+EmbeddingMatrix matrix_product(const EmbeddingMatrix a, const EmbeddingMatrix b);
 
 #endif

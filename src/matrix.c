@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 
 #include "embedding.h"
 #include "matrix.h"
@@ -74,4 +75,21 @@ EmbeddingMatrix matrix_copy(const EmbeddingMatrix a) {
   }
 
   return b;
+}
+
+EmbeddingMatrix matrix_product(const EmbeddingMatrix a, const EmbeddingMatrix b) {
+  assert(a.dimension == b.vocabulary_size);
+
+  EmbeddingMatrix c = create_embedding_matrix(a.vocabulary_size, b.dimension);
+
+  for (int row = 0; row < a.vocabulary_size; row++) {
+    for (int col = 0; col < b.dimension; col++) {
+
+      for (int k = 0; k < a.dimension; k++) {
+        c.vectors[row].values[col] += a.vectors[row].values[k] * b.vectors[k].values[col];
+      }
+    }
+  }
+
+  return c;
 }
