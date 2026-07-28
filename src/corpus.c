@@ -87,6 +87,12 @@ Corpus build_corpus(void) {
     snprintf(path, sizeof(path), "dataset/%s", namelist[i]->d_name);
     corpus.tokens[i] = tokenize_file(path);
     corpus.documents[corpus.documents_count] = compute_tf(corpus.tokens[i]);
+
+    if (!corpus.documents[corpus.documents_count].success) {
+      free_corpus(&corpus);
+      return corpus;
+    }
+
     corpus.documents_count++;
 
     free(namelist[i]);
@@ -95,6 +101,11 @@ Corpus build_corpus(void) {
 
   corpus.vocabulary = build_vocabulary(corpus.documents, corpus.documents_count);
 
+  if (!corpus.vocabulary.success) {
+    free_corpus(&corpus);
+    return corpus;
+  }
+
   copy_id_to_documents(corpus.documents, corpus.documents_count, corpus.vocabulary);
   copy_id_to_tokens(corpus.tokens, corpus.documents_count, corpus.vocabulary);
 
@@ -102,5 +113,7 @@ Corpus build_corpus(void) {
   compute_corpus_tfidf(corpus.documents, corpus.documents_count, &corpus.vocabulary);
 
   corpus_document_tf_idf_magnitude(corpus.documents, corpus.documents_count, corpus.vocabulary.count);
+
+  corpus.success = true;
   return corpus;
 }

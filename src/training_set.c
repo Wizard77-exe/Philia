@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #include "setfree.h"
-#include "structures.h"
+#include "training_set.h"
 
 TrainingSet build_training_set(Corpus c, int window_size) {
   TrainingSet t = {0};
@@ -64,5 +64,15 @@ void shuffle_training_pairs(TrainingSet *ts)
     TrainingPair temp = ts->pairs[i];
     ts->pairs[i] = ts->pairs[j];
     ts->pairs[j] = temp;
+  }
+}
+
+void shuffle_cbow_samples(CBOWTrainingSet *samples) {
+  for (int i = samples->samples_count - 1; i > 0; i--) {
+    int j = rand() % (i + 1);
+
+    CBOWSample tmp = samples->samples[i];
+    samples->samples[i] = samples->samples[j];
+    samples->samples[j] = tmp;
   }
 }

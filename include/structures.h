@@ -5,11 +5,11 @@
 
 #define WINDOW_SIZE   2
 #define EMBEDDING_DIM 64
-#define LEARNING_RATE 0.01f
+#define LEARNING_RATE 0.001f
 #define EPSILON       1e-8f
 #define BETA1         0.9f
 #define BETA2         0.999f
-#define EPOCHS        200
+#define EPOCHS        100
 #define ALPHA         0.5f
 
 // from TF_IDF
@@ -69,13 +69,14 @@ typedef struct {
 } Vocabulary;
 
 typedef struct {
+    Vocabulary vocabulary;
     Document *documents;
     Tokens *tokens;
 
     int documents_count;
     int documents_capacity;
 
-    Vocabulary vocabulary;
+    bool success;
 } Corpus;
 
 typedef struct {
@@ -182,12 +183,38 @@ typedef struct {
   bool success;
 } AdamState;
 
-typedef struct Query {
+typedef struct {
   Tokens tokens;
   Document document;
   float *embeddings;
 
   bool success;
 } Query;
+
+// NOTE: For CBOW.
+typedef struct {
+  int *context;
+  int center;
+  int context_count;
+
+  bool success;
+} CBOWSample;
+
+typedef struct {
+  CBOWSample *samples;
+  int capacity;
+  int samples_count;
+
+  bool success;
+} CBOWTrainingSet;
+
+typedef struct {
+  float *logits;
+  float *probabilities;
+
+  int vocabulary_size;
+
+  bool success;
+} CBOWForward;
 
 #endif

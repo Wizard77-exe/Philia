@@ -54,7 +54,7 @@ int main() {
       //check.
 
       // cross entropy loss.
-      float loss = compute_cross_entropy_loss(&forward, ts.pairs[pair].context);
+      float loss = compute_cross_entropy_loss(forward.probabilities, ts.pairs[pair].context);
 
       // backward pass.
       BackwardPass backward = backward_skipgram(&model, &forward, &expected, ts.pairs[pair].center);
@@ -65,7 +65,7 @@ int main() {
       adam.timestep++;
 
       // Update INPUT embedding
-      for (int dim = 0; dim < EMBEDDING_DIM; dim++) {
+      for (int dim = 0; dim < model.embedding_dim; dim++) {
         update_adam_parameter(&model.input.vectors[ts.pairs[pair].center].values[dim]
                               , backward.d_hidden[dim]
                               , &adam.input_direction.vectors[ts.pairs[pair].center].values[dim]

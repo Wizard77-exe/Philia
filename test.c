@@ -1,48 +1,30 @@
 #include <stdio.h>
-#include <math.h>
 
-#include "matrix.h"
-#include "embedding.h"
+#include "cbow.h"
 #include "setfree.h"
 #include "structures.h"
+#include "corpus.h"
 
 int main() {
-  EmbeddingMatrix a = create_embedding_matrix(2, 3);
-  random_initialize_embedding(&a);
-  EmbeddingMatrix b = create_embedding_matrix(3, 5);
-  random_initialize_embedding(&b);
+  Corpus corpus = build_corpus();
 
-  EmbeddingMatrix c = matrix_product(a, b);
+  CBOWTrainingSet cbow = build_cbow_samples(corpus, WINDOW_SIZE);
 
-  printf("Matrix A: \n");
-  for (int i = 0; i < a.vocabulary_size; i++) {
-    printf("[");
-    for (int j = 0; j < a.dimension; j++) {
-      printf("%f ", a.vectors[i].values[j]);
-    }
-    printf("]\n");
+  if (!cbow.success) {
+    printf("ERROR\n");
+    free_corpus(&corpus);
   }
 
-  printf("Matrix B: \n");
-  for (int i = 0; i < b.vocabulary_size; i++) {
-    printf("[");
-    for (int j = 0; j < b.dimension; j++) {
-      printf("%f ", b.vectors[i].values[j]);
+  for (int i = 0; i < cbow.samples_count; i++) {
+    printf("CBOW Sample #%d\n", i + 1);
+    printf("Center Word: %-15s Context Words: [", corpus.vocabulary.terms[cbow.samples[i].center].word);
+    for (int j = 0; j < cbow.samples[i].context_count; j++) {
+      printf("%-10s ", corpus.vocabulary.terms[cbow.samples[i].context[j]].word);
     }
-    printf("]\n");
+    printf("]\n\n");
   }
 
-  printf("Matrix Product: \n");
-  for (int i = 0; i < c.vocabulary_size; i++) {
-    printf("[");
-    for (int j = 0; j < c.dimension; j++) {
-      printf("%f ", c.vectors[i].values[j]);
-    }
-    printf("]\n");
-  }
-
-  free_embedding_matrix(&a);
-  free_embedding_matrix(&b);
-  free_embedding_matrix(&c);
+  free_corpus(&corpus);
+  free_cbow_training_set(&cbow);
   return 0;
 }

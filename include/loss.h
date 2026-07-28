@@ -3,6 +3,6 @@
 
 #include "structures.h"
 
-float compute_cross_entropy_loss(ForwardPass *forward, int target_word_id);
+float compute_cross_entropy_loss(float *probabilities, int target_word_id);
 
 #endif

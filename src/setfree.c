@@ -113,6 +113,7 @@ void free_forwardpass(ForwardPass *fp) {
   free(fp->logits);
   free(fp->probabilities);
   fp->logits = NULL;
+  fp->probabilities = NULL;
   fp->vocabulary_size = 0;
   fp->success = false;
 }
@@ -140,4 +141,26 @@ void free_query(Query *query) {
   free_document(&query->document);
   free(query->embeddings);
   query->embeddings = NULL;
+}
+
+void free_cbow_training_set(CBOWTrainingSet *cbow) {
+  for (int i = 0; i < cbow->samples_count; i++) {
+    free(cbow->samples[i].context);
+    cbow->samples[i].center = 0;
+    cbow->samples[i].context_count = 0;
+    cbow->samples[i].success = false;
+  }
+  free(cbow->samples);
+  cbow->samples = NULL;
+  cbow->capacity = 0;
+  cbow->success = false;
+}
+
+void free_forward_cbow(CBOWForward *cfp) {
+  free(cfp->probabilities);
+  free(cfp->logits);
+  cfp->probabilities = NULL;
+  cfp->logits = NULL;
+  cfp->vocabulary_size = 0;
+  cfp->success = false;
 }

@@ -25,7 +25,8 @@ ExpectedDistribution create_expected_distribution(int vocabulary_size, int targe
   return expected;
 }
 
-static float *compute_d_logits(ForwardPass *forward, ExpectedDistribution *expected) {
+// NOTE: make a copy of this function for SkipGram.
+static float *compute_d_logits(CBOWForward *forward, ExpectedDistribution *expected) {
   float *d_logits = calloc(forward->vocabulary_size, sizeof(float));
   // check.
   for (int i = 0; i < forward->vocabulary_size; i++) {
@@ -63,7 +64,8 @@ static EmbeddingMatrix compute_output_gradients(SkipGram *model, float *d_logits
   return output_gradients;
 }
 
-BackwardPass backward_skipgram(SkipGram *model, ForwardPass *forward, ExpectedDistribution *expected, int center) {
+// NOTE: make a copy of this function that works for SkipGram.
+BackwardPass backward_skipgram(SkipGram *model, CBOWForward *forward, ExpectedDistribution *expected, int center) {
   BackwardPass backward = {0};
 
   backward.d_logits = compute_d_logits(forward, expected);

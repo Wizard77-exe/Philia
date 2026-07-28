@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "structures.h"
+#include "skipgram.h"
 #include "setfree.h"
 #include "embedding.h"
 

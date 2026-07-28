@@ -39,4 +39,10 @@ void free_backwardpass(BackwardPass *backward);
 // NOTE: For freeing Query.
 void free_query(Query *query);
 
+// NOTE: For freeing CBOWTrainingSet.
+void free_cbow_training_set(CBOWTrainingSet *cbow);
+
+// NOTE: For freeing CBOWForward
+void free_forward_cbow(CBOWForward *cfp);
+
 #endif
