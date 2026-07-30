@@ -245,7 +245,6 @@ float matrix_min(const Matrix m) {
 }
 
 unsigned int matrix_argmax(const Matrix m) {
-  int idx = 0;
   float max = matrix_max(m);
 
   for (int i = 0; i < m.rows * m.cols; i++) {
@@ -257,7 +256,6 @@ unsigned int matrix_argmax(const Matrix m) {
 }
 
 unsigned int matrix_argmin(const Matrix m) {
-  int idx = 0; 
   float min = matrix_min(m);
 
   for (int i = 0; i < m.rows * m.cols; i++) {

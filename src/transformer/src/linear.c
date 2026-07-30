@@ -72,3 +72,69 @@ Matrix linear_forward(const Linear *layer, const Matrix input) {
 
   return y;
 }
+
+void linear_backward(const Linear *layer
+                   , const Matrix input
+                   , const Matrix d_output
+                   , Matrix *d_weights
+                   , Matrix *d_bias
+                   , Matrix *d_input
+) {
+  if (layer == NULL || d_weights == NULL || d_bias == NULL || d_input == NULL) {
+    fprintf(stderr, "ERROR: linear_backward() received NULL parameter.\n");
+    return;
+  }
+
+  if (input.rows != d_output.rows || d_output.cols != layer->out_features || input.cols != layer->in_features) {
+    fprintf(stderr, "ERROR: linear_backward() failed because of dimension mismatch.\n");
+    return;
+  }
+
+  // computing dW
+  Matrix dy_t = matrix_transpose(d_output);
+  if (!MATRIX_OK(dy_t)) {
+    fprintf(stderr, "ERROR: Transposing d_output in linear_backward() function.\n");
+    return;
+  }
+
+  Matrix dW = matrix_multiply(&dy_t, &input);
+  if (!MATRIX_OK(dW)) {
+    fprintf(stderr, "ERROR: Matrix Multiplication failed.\n");
+    matrix_free(&dy_t);
+    return;
+  }
+
+  *d_weights = dW;
+  
+  dW.data = NULL;
+
+  matrix_free(&dW);
+  matrix_free(&dy_t);
+
+  // computing db
+  Matrix db = matrix_create(1, layer->out_features);
+  matrix_fill(&db, 0);
+  // check.
+  for (int col = 0; col < d_output.cols; col++) {
+    for (int row = 0; row < d_output.rows; row++) {
+      MAT_AT(db, 0, col) += MAT_AT(d_output, row, col);
+    }
+  }
+
+  *d_bias = db;
+
+  db.data = NULL;
+  matrix_free(&db);
+
+  // computing dX
+  Matrix dX = matrix_multiply(&d_output, &layer->weights);
+  if (!MATRIX_OK(dX)) {
+    fprintf(stderr, "ERROR: Matrix MUltiplication failed.\n");
+    return;
+  }
+
+  *d_input = dX;
+
+  dX.data = NULL;
+  matrix_free(&dX);
+}

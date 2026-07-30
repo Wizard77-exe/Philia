@@ -24,4 +24,12 @@ void linear_free(Linear *layer);
 
 Matrix linear_forward(const Linear *layer, const Matrix input);
 
+void linear_backward(const Linear *layer
+                   , const Matrix input
+                   , const Matrix d_output
+                   , Matrix *d_weights
+                   , Matrix *d_bias
+                   , Matrix *d_input
+);
+
 #endif

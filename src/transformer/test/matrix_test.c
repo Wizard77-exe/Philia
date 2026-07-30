@@ -33,16 +33,34 @@ int main() {
   memcpy(input.data, x, sizeof(x));
 
   Matrix output = linear_forward(&layer, input);
+  
+  Matrix d_weights = MATRIX_ERROR;
+  Matrix d_bias = MATRIX_ERROR;
+  Matrix d_input = MATRIX_ERROR;
 
-  printf("Weights: \n");
+  linear_backward(&layer, input, output, &d_weights, &d_bias, &d_input);
+
+  printf("Weights:");
   matrix_pretty_print(layer.weights);
-  printf("Bias: \n");
+  printf("\nBias:");
   matrix_pretty_print(layer.bias);
-  printf("Input: \n");
+  printf("\nInput:");
   matrix_pretty_print(input);
-  printf("Output: ");
-
+  printf("\nOutput: ");
   matrix_pretty_print(output);
+
+  printf("\n\n");
+
+  printf("dW:");
+  matrix_pretty_print(d_weights);
+  printf("\ndb:");
+  matrix_pretty_print(d_bias);
+  printf("\ndX:");
+  matrix_pretty_print(d_input);
+
+  matrix_free(&d_weights);
+  matrix_free(&d_bias);
+  matrix_free(&d_input);
 
   linear_free(&layer);
   matrix_free(&input);
