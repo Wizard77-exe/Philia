@@ -1,29 +1,52 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "matrix.h"
+#include "linear.h"
 
 int main() {
   srand(time(NULL));
   
-  Matrix a = matrix_create(3, 3);
-  a.data[0] = 1;
-  a.data[1] = 2;
-  a.data[2] = 3;
-  a.data[3] = 2;
-  a.data[4] = 4;
-  a.data[5] = 5;
-  a.data[6] = 3;
-  a.data[7] = 5;
-  a.data[8] = 6;
-  matrix_pretty_print(a);
+  Linear layer = linear_create(4, 3);
 
-  printf("Is Square: %s\n", matrix_is_square(a) ? "true" : "false");
-  printf("Is Identity: %s\n", matrix_is_identity(a) ? "true" : "false");
-  printf("Is Symmetric: %s\n", matrix_is_symmetric(a) ? "true" : "false");
+  float w[] = {
+     1,  2,  3,  4,
+     5,  6,  7,  8,
+     9, 10, 11, 12
+  };
 
-  matrix_free(&a);
+  memcpy(layer.weights.data, w, sizeof(w));
+
+  float b[] = {1, 2, 3};
+
+  memcpy(layer.bias.data, b, sizeof(b));
+
+  Matrix input = matrix_create(2, 4);
+  
+  float x[] = {
+    1,1,1,1,
+    2,2,2,2
+  };
+
+  memcpy(input.data, x, sizeof(x));
+
+  Matrix output = linear_forward(&layer, input);
+
+  printf("Weights: \n");
+  matrix_pretty_print(layer.weights);
+  printf("Bias: \n");
+  matrix_pretty_print(layer.bias);
+  printf("Input: \n");
+  matrix_pretty_print(input);
+  printf("Output: ");
+
+  matrix_pretty_print(output);
+
+  linear_free(&layer);
+  matrix_free(&input);
+  matrix_free(&output);
 
   return 0;
 }

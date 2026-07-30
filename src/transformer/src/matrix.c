@@ -26,6 +26,10 @@ void matrix_pretty_print(const Matrix matrix) {
 }
 
 Matrix matrix_create(int rows, int cols) {
+  if (rows <= 0 || cols <= 0) {
+    fprintf(stderr, "ERROR: Column or Row can't be zero or negative.\n");
+    return MATRIX_ERROR;
+  }
   Matrix matrix = {0};
 
   matrix.rows = rows;
@@ -172,7 +176,11 @@ Matrix matrix_multiply(const Matrix *a, const Matrix *b) {
   return c;
 }
 
-Matrix matrix_identity(unsigned int size) {
+Matrix matrix_identity(int size) {
+  if (size <= 0) {
+    fprintf(stderr, "ERROR: matrix_identity() requires dimension greater than zero.\n");
+    return MATRIX_ERROR;
+  }
   Matrix I = matrix_create(size, size);
   if (!MATRIX_OK(I)) {
     fprintf(stderr, "ERROR: Matrix creation failure.\n");
@@ -236,7 +244,7 @@ float matrix_min(const Matrix m) {
   return min;
 }
 
-int matrix_argmax(const Matrix m) {
+unsigned int matrix_argmax(const Matrix m) {
   int idx = 0;
   float max = matrix_max(m);
 
@@ -248,7 +256,7 @@ int matrix_argmax(const Matrix m) {
   return -1;
 }
 
-int matrix_argmin(const Matrix m) {
+unsigned int matrix_argmin(const Matrix m) {
   int idx = 0; 
   float min = matrix_min(m);
 
@@ -515,4 +523,22 @@ bool matrix_is_symmetric(const Matrix m) {
   }
 
   return true;
+}
+
+void matrix_add_bias(Matrix *output, const Matrix bias) {
+  if (output == NULL) {
+    fprintf(stderr, "ERROR: Output is NULL.\n");
+    return;
+  }
+
+  if (bias.rows != 1 || bias.cols != output->cols) {
+    fprintf(stderr, "ERROR: bias shape mismatch.\n");
+    return;
+  }
+
+  for (int row = 0; row < output->rows; row++) {
+    for (int col = 0; col < output->cols; col++) {
+      MAT_AT(*output, row, col) += MAT_AT(bias, 0, col);
+    }
+  }
 }

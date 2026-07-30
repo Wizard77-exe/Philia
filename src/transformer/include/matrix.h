@@ -17,7 +17,7 @@
 
 #define MAT_AT(m,r,c) ((m).data[(r)*(m).cols+(c)])
 
-#define MATRIX_SIZE(m) ((m).rows * (m).cols);
+#define MATRIX_SIZE(m) ((m).rows * (m).cols)
 
 #define MATRIX_SET(m, r, c, val) \
   ((m).data[(r) * (m).cols + (c)] = (val))
@@ -49,7 +49,7 @@ Matrix matrix_addition(const Matrix a, const Matrix b);
 Matrix matrix_subtraction(const Matrix a, const Matrix b);
 Matrix matrix_scalar(const Matrix *a, float scalar);
 Matrix matrix_multiply(const Matrix *a, const Matrix *b);
-Matrix matrix_identity(unsigned int size);
+Matrix matrix_identity(int size);
 
 float matrix_sum(const Matrix m);
 float matrix_mean(const Matrix m);
@@ -57,8 +57,8 @@ float matrix_variance(const Matrix m);
 float matrix_max(const Matrix m);
 float matrix_min(const Matrix m);
 
-int matrix_argmax(const Matrix m);
-int matrix_argmin(const Matrix m);
+unsigned int matrix_argmax(const Matrix m);
+unsigned int matrix_argmin(const Matrix m);
 
 Matrix matrix_apply(const Matrix m, float (*func)(float));
 Matrix matrix_hadamard(const Matrix a, const Matrix b);
@@ -86,5 +86,7 @@ float matrix_trace(const Matrix a);
 bool matrix_is_square(const Matrix m);
 bool matrix_is_identity(const Matrix m);
 bool matrix_is_symmetric(const Matrix m);
+
+void matrix_add_bias(Matrix *output, const Matrix bias);
 
 #endif
