@@ -109,15 +109,6 @@ That's intentional.
 
 ---
 
-## Version History
-
-- v1.x — Keyword Matching
-- v2.x — Natural Language Processing
-- v2.2 — TF-IDF Pipeline
-- v2.2.6 — Cosine Similarity (Current)
-
----
-
 ## A Personal Note
 
 Philia began before I even knew how to use `malloc()`.
