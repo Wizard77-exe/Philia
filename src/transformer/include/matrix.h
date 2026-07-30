@@ -3,7 +3,8 @@
 
 #include <stdbool.h>
 
-#define PI 3.14159265358979323846f
+#define PI                                3.14159265358979323846f
+#define MATRIX_EPSILON                    1e-8f
 
 #define MATRIX_ERROR ((Matrix){      \
     .data = NULL,                    \
@@ -57,6 +58,7 @@ float matrix_max(const Matrix m);
 float matrix_min(const Matrix m);
 
 int matrix_argmax(const Matrix m);
+int matrix_argmin(const Matrix m);
 
 Matrix matrix_apply(const Matrix m, float (*func)(float));
 Matrix matrix_hadamard(const Matrix a, const Matrix b);
@@ -75,5 +77,14 @@ Matrix matrix_outer(const Matrix a, const Matrix b);
 float matrix_norm(const Matrix x);
 
 void matrix_normalize(Matrix *m);
+void matrix_clip(Matrix *m, float min, float max);
+
+bool matrix_equal(const Matrix a, const Matrix b, float epsilon);
+
+float matrix_trace(const Matrix a);
+
+bool matrix_is_square(const Matrix m);
+bool matrix_is_identity(const Matrix m);
+bool matrix_is_symmetric(const Matrix m);
 
 #endif

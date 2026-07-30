@@ -238,16 +238,26 @@ float matrix_min(const Matrix m) {
 
 int matrix_argmax(const Matrix m) {
   int idx = 0;
-  float max = m.data[0];
+  float max = matrix_max(m);
 
   for (int i = 0; i < m.rows * m.cols; i++) {
-    if (m.data[i] > max) {
-      max = m.data[i];
-      idx = i;
-    }
+    if (m.data[i] == max)
+      return i;
   }
 
-  return idx;
+  return -1;
+}
+
+int matrix_argmin(const Matrix m) {
+  int idx = 0; 
+  float min = matrix_min(m);
+
+  for (int i = 0; i < m.rows * m.cols; i++) {
+    if (m.data[i] == min) 
+      return i;
+  }
+
+  return -1;
 }
 
 Matrix matrix_apply(const Matrix m, float (*func)(float)) {
@@ -470,4 +480,39 @@ float matrix_trace(const Matrix a) {
   }
 
   return trace;
+}
+
+bool matrix_is_square(const Matrix m) {
+  return m.rows == m.cols;
+}
+
+bool matrix_is_identity(const Matrix m) {
+  if (!matrix_is_square(m))
+    return false;
+
+  for (int row = 0; row < m.rows; row++) {
+    for (int col = 0; col < m.cols; col++) {
+      if (row != col && fabsf(MAT_AT(m, row, col) - 0.0f) > MATRIX_EPSILON)
+        return false;
+
+      if (row == col && fabsf(MAT_AT(m, row, col) - 1.0f) > MATRIX_EPSILON)
+        return false;
+    }
+  }
+
+  return true;
+}
+
+bool matrix_is_symmetric(const Matrix m) {
+  if (!matrix_is_square(m))
+    return false;
+
+  for (int i = 0; i < m.rows; i++) {
+    for (int j = 0; j < i; j++) {
+      if (fabsf(MAT_AT(m, i, j) - MAT_AT(m, j, i)) > MATRIX_EPSILON)
+        return false;
+    }
+  }
+
+  return true;
 }
