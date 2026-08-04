@@ -76,6 +76,25 @@ Matrix matrix_copy(const Matrix *src) {
   return copy;
 }
 
+void matrix_move(Matrix *dest, Matrix *src) {
+  if (dest == NULL || src == NULL) {
+    fprintf(stderr, "ERROR: matrix_move() received a NULL pointer to a Matrix.\n");
+    return;
+  }
+
+  if (MATRIX_OK(*dest)) {
+    fprintf(stderr, "ERROR: matrix_move(). Destination owns allocated memory.");
+    return;
+  }
+
+  *dest = *src;
+
+  src->data = NULL;
+
+  /* Source no longer owns the data. Reset it to an empty matrix. */
+  matrix_free(src);
+}
+
 Matrix matrix_transpose(const Matrix m) {
   Matrix m_t = matrix_create(m.cols, m.rows);
   if (!MATRIX_OK(m_t)) {

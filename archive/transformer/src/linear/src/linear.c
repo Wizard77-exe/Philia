@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "linear.h"
 
@@ -58,19 +59,86 @@ Matrix linear_forward(const Linear *layer, const Matrix input) {
     return MATRIX_ERROR;
   }
 
-  Matrix y = matrix_multiply(&input, &wt);
+  Matrix z = matrix_multiply(&input, &wt);
 
   matrix_free(&wt);
 
-  if (!MATRIX_OK(y)) {
+  if (!MATRIX_OK(z)) {
     fprintf(stderr, "ERROR: Matrix Multiplication failed.\n");
     matrix_free(&wt);
     return MATRIX_ERROR;
   }
 
-  matrix_add_bias(&y, layer->bias);
+  matrix_add_bias(&z, layer->bias);
 
-  return y;
+  return z;
+}
+
+static bool compute_dW(const Matrix d_output, const Matrix input, Matrix *d_weights) {
+  Matrix dy_t = matrix_transpose(d_output);
+
+  if (!MATRIX_OK(dy_t)) {
+    fprintf(stderr, "ERROR: Transposing d_output.\n");
+    return false;
+  }
+
+  Matrix dW = matrix_multiply(&dy_t, &input);
+
+  if (!MATRIX_OK(dW)) {
+    fprintf(stderr, "ERROR: Matrix Multiplication failure.\n");
+    matrix_free(&dy_t);
+    return false;
+  }
+
+  *d_weights = dW;
+
+  dW.data = NULL;
+  matrix_free(&dy_t);
+  matrix_free(&dW);
+
+  return true;
+}
+
+static bool compute_db(const Matrix d_output, Matrix *d_bias) {
+  Matrix db = matrix_create(1, d_output.cols);
+
+  if (!MATRIX_OK(db)) {
+    fprintf(stderr, "ERROR: Matrix creation failed.");
+    return false;
+  }
+
+  matrix_fill(&db, 0);
+
+  // check.
+  for (int col = 0; col < d_output.cols; col++) {
+    for (int row = 0; row < d_output.rows; row++) {
+      MAT_AT(db, 0, col) += MAT_AT(d_output, row, col);
+    }
+  }
+
+  *d_bias = db;
+
+  db.data = NULL;
+  matrix_free(&db);
+
+  return true;
+}
+
+static bool compute_dX(const Linear *layer, const Matrix d_output, Matrix *d_input) {
+  Matrix dX = matrix_multiply(&d_output, &layer->weights);
+
+  if (!MATRIX_OK(dX)) {
+    fprintf(stderr, "ERROR: Matrix MUltiplication failed.\n");
+    return false;
+  }
+
+  *d_input = dX;
+
+  dX.data = NULL;
+
+  matrix_free(&dX);
+
+  return true;
 }
 
 void linear_backward(const Linear *layer
@@ -90,51 +158,21 @@ void linear_backward(const Linear *layer
     return;
   }
 
-  // computing dW
-  Matrix dy_t = matrix_transpose(d_output);
-  if (!MATRIX_OK(dy_t)) {
-    fprintf(stderr, "ERROR: Transposing d_output in linear_backward() function.\n");
+  if (!compute_dW(d_output, input, d_weights)) {
+    fprintf(stderr, "ERROR: d_weight computation failed.\n");
     return;
   }
 
-  Matrix dW = matrix_multiply(&dy_t, &input);
-  if (!MATRIX_OK(dW)) {
-    fprintf(stderr, "ERROR: Matrix Multiplication failed.\n");
-    matrix_free(&dy_t);
+  if (!compute_db(d_output, d_bias)) {
+    fprintf(stderr, "ERROR: d_bias computation failed.\n");
+    matrix_free(d_weights);
     return;
   }
 
-  *d_weights = dW;
-  
-  dW.data = NULL;
-
-  matrix_free(&dW);
-  matrix_free(&dy_t);
-
-  // computing db
-  Matrix db = matrix_create(1, layer->out_features);
-  matrix_fill(&db, 0);
-  // check.
-  for (int col = 0; col < d_output.cols; col++) {
-    for (int row = 0; row < d_output.rows; row++) {
-      MAT_AT(db, 0, col) += MAT_AT(d_output, row, col);
-    }
-  }
-
-  *d_bias = db;
-
-  db.data = NULL;
-  matrix_free(&db);
-
-  // computing dX
-  Matrix dX = matrix_multiply(&d_output, &layer->weights);
-  if (!MATRIX_OK(dX)) {
-    fprintf(stderr, "ERROR: Matrix MUltiplication failed.\n");
+  if (!compute_dX(layer, d_output, d_input)) {
+    fprintf(stderr, "ERROR: d_input computation failed.\n");
+    matrix_free(d_weights);
+    matrix_free(d_bias);
     return;
   }
-
-  *d_input = dX;
-
-  dX.data = NULL;
-  matrix_free(&dX);
 }

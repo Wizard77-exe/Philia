@@ -43,6 +43,8 @@ Matrix matrix_create(int rows, int cols);
 void matrix_fill(Matrix *m, float value);
 void matrix_random(Matrix *m);
 
+void matrix_move(Matrix *dest, Matrix *src);
+
 Matrix matrix_copy(const Matrix *src);
 Matrix matrix_transpose(const Matrix m);
 Matrix matrix_addition(const Matrix a, const Matrix b);

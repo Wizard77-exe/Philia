@@ -10,6 +10,8 @@
     .out_features = 0               \
     })
 
+#define LINEAR_OK(l) ((l).in_fatures == 0 && (l).out_features == 0)
+
 typedef struct {
   Matrix weights;
   Matrix bias;
