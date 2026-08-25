@@ -50,7 +50,7 @@ void free_document(Document *d) {
 
 // NOTE: for freeing Vocabulary
 void free_vocabulary(Vocabulary *v) {
-  for (int i = 0; i < v->count; i++) {
+  for (int i = 0; i < v->capacity; i++) {
     free(v->terms[i].word);
   }
   free(v->terms);

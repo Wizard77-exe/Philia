@@ -17,6 +17,7 @@ typedef struct {
   char *word;
   int id;
 } Token;
+
 typedef struct {
   Token *tokens;
 
@@ -51,12 +52,8 @@ typedef struct {
 } Document;
 
 typedef struct {
-  int df;
-  int id;
-
-  float idf;
-
   char *word;
+  int id;
 } VocabularyTerm;
 
 typedef struct {
@@ -64,6 +61,8 @@ typedef struct {
 
     int count;
     int capacity;
+
+    float load_factor;
 
     bool success;
 } Vocabulary;
