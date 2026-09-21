@@ -42,3 +42,7 @@ void insert(Vocabulary *vocabulary, char *key) {
   vocabulary->terms[index].id = vocabulary->count;
   vocabulary->count++;
 }
+
+int get_id(char *key) {
+
+}
